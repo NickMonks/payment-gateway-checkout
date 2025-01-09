@@ -1,6 +1,6 @@
 namespace PaymentGateway.Api.ApiClient;
 
-public class SimulatorClient
+public class SimulatorApiClient
 {
     
 }

@@ -1,4 +1,10 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
+using PaymentGateway.Api.ApiClient;
+using PaymentGateway.Api.Contracts;
 using PaymentGateway.Api.Services;
+using PaymentGateway.Api.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +16,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<PaymentsRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<PaymentsValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
+
+builder.Services.AddHttpClient(nameof(SimulatorApiClient));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
