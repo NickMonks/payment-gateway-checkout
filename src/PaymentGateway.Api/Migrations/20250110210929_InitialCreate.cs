@@ -11,16 +11,20 @@ namespace PaymentGateway.Api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:currency", "usd,eur,gbp")
+                .Annotation("Npgsql:Enum:payment_status", "authorized,declined,rejected");
+
             migrationBuilder.CreateTable(
                 name: "Payments",
                 columns: table => new
                 {
                     PaymentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PaymentStatus = table.Column<int>(type: "integer", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "text", nullable: false),
                     CardNumberFourDigits = table.Column<int>(type: "integer", nullable: false),
                     ExpirationMonth = table.Column<string>(type: "text", nullable: false),
                     ExpirationYear = table.Column<string>(type: "text", nullable: false),
-                    Currency = table.Column<int>(type: "integer", nullable: false),
+                    Currency = table.Column<string>(type: "text", nullable: false),
                     Amount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

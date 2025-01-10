@@ -26,9 +26,14 @@ public class PaymentsController : Controller
     [HttpGet("{id:guid}")]
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PostPaymentResponse?>> GetPaymentAsync(Guid id)
     {
         var paymentResponse = await _paymentService.GetPayment(id);
+        if (paymentResponse == null)
+        {
+            return NotFound("Payment not found");
+        }
         return Ok(paymentResponse);
     }
 

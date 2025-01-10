@@ -20,6 +20,8 @@ namespace PaymentGateway.Api.Migrations
                 .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "currency", new[] { "usd", "eur", "gbp" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "payment_status", new[] { "authorized", "declined", "rejected" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("PaymentGateway.Api.Models.Entities.Payment", b =>
@@ -34,8 +36,9 @@ namespace PaymentGateway.Api.Migrations
                     b.Property<int>("CardNumberFourDigits")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Currency")
-                        .HasColumnType("integer");
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("ExpirationMonth")
                         .IsRequired()
@@ -45,8 +48,9 @@ namespace PaymentGateway.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PaymentStatus")
-                        .HasColumnType("integer");
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("PaymentId");
 
