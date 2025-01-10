@@ -5,6 +5,6 @@ namespace PaymentGateway.Api.Contracts;
 
 public interface IPaymentService
 {
-    Task<PostPaymentResponse> CreatePayment(PostPaymentRequest payment);
+    Task<PostPaymentResponse> CreatePayment(PostPaymentRequest request);
     Task<GetPaymentResponse> GetPayment(Guid paymentId);
 }

@@ -15,9 +15,14 @@ public class PaymentsController : Controller
     private readonly ILogger<PaymentsController> _logger;
     private readonly IPaymentService _paymentService;
 
-    public PaymentsController(PaymentsRepository paymentsRepository)
+    public PaymentsController(
+        PaymentsRepository paymentsRepository, 
+        IPaymentService paymentService, 
+        ILogger<PaymentsController> logger)
     {
         _paymentsRepository = paymentsRepository;
+        _paymentService = paymentService;
+        _logger = logger;
     }
 
     [HttpGet("{id:guid}")]
@@ -33,14 +38,14 @@ public class PaymentsController : Controller
     [HttpPost]
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<PostPaymentResponse?>> CreatePaymentAsync(PostPaymentRequest request)
+    public async Task<ActionResult<PostPaymentResponse?>> CreatePaymentAsync([FromBody] PostPaymentRequest request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest();
         }
 
-        var paymentResponse = _paymentService.CreatePayment(request);
+        var paymentResponse = await _paymentService.CreatePayment(request);
         return Ok(paymentResponse);
     }
 }

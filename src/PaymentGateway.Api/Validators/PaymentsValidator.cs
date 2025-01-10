@@ -9,9 +9,9 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
 {
     public PaymentsValidator()
     {
-        RuleFor(x => x.CardNumberLastFour)
+        RuleFor(x => x.CardNumber)
             .NotEmpty()
-            .Must(number => HasDigits(number, 14,19))
+            .Must(card => HasDigits(card, 14,19))
             .WithMessage("Card number must be between 19 and 14 characters.");
         RuleFor(x => x.ExpiryMonth)
             .InclusiveBetween(1, 12).WithMessage("Expiry month must be between January and December (numeric)");
@@ -38,10 +38,14 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
         return year > DateTime.Now.Year || (year == DateTime.Now.Year && month >= DateTime.Now.Month);
     }
 
-    private bool HasDigits(int number, int min, int max)
+    private bool HasDigits(string number, int min, int max)
     {
-        string numberString = number.ToString();
-        return numberString.Length >= min && numberString.Length <= max;
+        if (string.IsNullOrEmpty(number))
+        {
+            return false;
+        }
+
+        return number.All(char.IsDigit) && number.Length >= min && number.Length <= max;
     }
 
     private bool BeValidCurrency(string currency)
