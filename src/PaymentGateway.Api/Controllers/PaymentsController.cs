@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using PaymentGateway.Api.Contracts;
 using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
+using PaymentGateway.Api.Persistence.Repositories;
 using PaymentGateway.Api.Services;
+using PaymentGateway.Api.Services.Contracts;
 
 namespace PaymentGateway.Api.Controllers;
 
@@ -11,16 +12,13 @@ namespace PaymentGateway.Api.Controllers;
 [ApiController]
 public class PaymentsController : Controller
 {
-    private readonly PaymentsRepository _paymentsRepository;
     private readonly ILogger<PaymentsController> _logger;
     private readonly IPaymentService _paymentService;
 
     public PaymentsController(
-        PaymentsRepository paymentsRepository, 
         IPaymentService paymentService, 
         ILogger<PaymentsController> logger)
     {
-        _paymentsRepository = paymentsRepository;
         _paymentService = paymentService;
         _logger = logger;
     }
@@ -30,9 +28,8 @@ public class PaymentsController : Controller
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<PostPaymentResponse?>> GetPaymentAsync(Guid id)
     {
-        var payment = _paymentsRepository.Get(id);
-
-        return new OkObjectResult(payment);
+        var paymentResponse = await _paymentService.GetPayment(id);
+        return Ok(paymentResponse);
     }
 
     [HttpPost]

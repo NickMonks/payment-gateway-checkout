@@ -2,10 +2,12 @@ using AutoMapper;
 
 using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.ApiClient.Models.Request;
-using PaymentGateway.Api.Contracts;
+using PaymentGateway.Api.Mappers;
 using PaymentGateway.Api.Models;
+using PaymentGateway.Api.Models.Entities;
 using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
+using PaymentGateway.Api.Services.Contracts;
 using PaymentGateway.Api.Utility;
 
 namespace PaymentGateway.Api.Services;
@@ -14,16 +16,19 @@ public class PaymentService : IPaymentService
 {
     private readonly ILogger<PaymentService> _logger;
     private readonly SimulatorApiClient _simulatorApiClient;
+    private readonly IPaymentsRepository _paymentsRepository;
     private readonly IMapper _mapper;
 
     public PaymentService(
         ILogger<PaymentService> logger, 
         SimulatorApiClient simulatorApiClient, 
-        IMapper mapper)
+        IMapper mapper, 
+        IPaymentsRepository paymentsRepository)
     {
         _logger = logger;
         _simulatorApiClient = simulatorApiClient;
         _mapper = mapper;
+        _paymentsRepository = paymentsRepository;
     }
     
     public async Task<PostPaymentResponse> CreatePayment(PostPaymentRequest request)
@@ -44,13 +49,15 @@ public class PaymentService : IPaymentService
             Amount = request.Amount
         };
 
-        // TODO: Store postPaymentResponse in the database
+        var paymentEntity = postPaymentResponse.ToPayment(_mapper.Map<PaymentStatus>(apiResponse));
+        await _paymentsRepository.CreatePaymentAsync(paymentEntity);
 
         return postPaymentResponse;
     }
 
-    public async Task<GetPaymentResponse> GetPayment(Guid paymentId)
+    public async Task<GetPaymentResponse?> GetPayment(Guid paymentId)
     {
-        throw new NotImplementedException();
+        var paymentDb = await _paymentsRepository.GetPaymentByIdAsync(paymentId);
+        return paymentDb?.ToPayment();
     }
 }

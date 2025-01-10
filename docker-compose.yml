@@ -12,4 +12,12 @@ services:
       - type: bind
         source: ./imposters
         target: /imposters
-      
+  postgres-db:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: payments-db
+    ports:
+      - "5432:5432"

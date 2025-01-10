@@ -1,16 +1,12 @@
-using System.Text.Json;
-
 using FluentValidation;
 using FluentValidation.AspNetCore;
-
-using Microsoft.AspNetCore.Diagnostics;
-
+using Microsoft.EntityFrameworkCore;
 using PaymentGateway.Api.ApiClient;
-using PaymentGateway.Api.Contracts;
 using PaymentGateway.Api.Exceptions;
+using PaymentGateway.Api.Persistence.Repositories;
 using PaymentGateway.Api.Services;
+using PaymentGateway.Api.Services.Contracts;
 using PaymentGateway.Api.Settings;
-using PaymentGateway.Api.Utility;
 using PaymentGateway.Api.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +17,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<PaymentsRepository>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-
+builder.Services.AddScoped<IPaymentsRepository, PaymentsRepository>();
 builder.Services.AddValidatorsFromAssemblyContaining<PaymentsValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddLogging();
@@ -38,11 +33,10 @@ builder.Services.AddHttpClient<SimulatorApiClient>(nameof(SimulatorApiClient), c
     client.BaseAddress = new Uri(simulatorApiSettings.BaseUri);
 });
 
-
+builder.Services.AddDbContext<PaymentsDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -54,7 +48,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-//app.UseExceptionHandler();
 app.UseMiddleware<ExceptionsMiddleware>();
 app.MapControllers();
 
