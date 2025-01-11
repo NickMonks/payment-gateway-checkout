@@ -37,6 +37,102 @@ public class PaymentsControllerTests : IClassFixture<WebApplicationFactory<Progr
             });
         }).CreateClient();
     }
+    
+    [Theory]
+    [InlineData("01","2024")]
+    [InlineData("00","2025")]
+    public async Task CreatePayment_ShouldReturn400BadRequest_WhenExpiredCard(string expiryMonth, string expiryYear)
+    {
+        // Arrange
+        var paymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "2222405343248877",
+            ExpiryMonth = int.Parse(expiryMonth),
+            ExpiryYear = int.Parse(expiryYear),
+            Currency = "USD",
+            Amount = 100,
+            Cvv = "123"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+    
+    [Theory]
+    [InlineData(-100)]
+    [InlineData(0)]
+    public async Task CreatePayment_ShouldReturn400BadRequest_WhenInvalidAmount(int amount)
+    {
+        // Arrange
+        var paymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "2222405343248877",
+            ExpiryMonth = 04,
+            ExpiryYear = 2025,
+            Currency = "USD",
+            Amount = amount,
+            Cvv = "123"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+    
+    [Theory]
+    [InlineData("1234")]
+    [InlineData("12")]
+    [InlineData("abc")]
+    public async Task CreatePayment_ShouldReturn400BadRequest_WhenInvalidCvv(string cvv)
+    {
+        // Arrange
+        var paymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "2222405343248877",
+            ExpiryMonth = 04,
+            ExpiryYear = 2025,
+            Currency = "USD",
+            Amount = 100,
+            Cvv = cvv
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    
+    [Theory]
+    [InlineData("123456")]
+    [InlineData("22224053432488**")]
+    [InlineData("dummy-data")]
+    public async Task CreatePayment_ShouldReturn400BadRequest_WhenInvalidCardNumber(string cardNumber)
+    {
+        // Arrange
+        var paymentRequest = new PostPaymentRequest
+        {
+            CardNumber = cardNumber,
+            ExpiryMonth = 04,
+            ExpiryYear = 2025,
+            Currency = "USD",
+            Amount = 100,
+            Cvv = "123"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
 
     [Fact]
     public async Task CreatePayment_ShouldReturnAuthorizedPaymentAndStoreInDatabase()
@@ -94,5 +190,46 @@ public class PaymentsControllerTests : IClassFixture<WebApplicationFactory<Progr
         var payment = await dbContext.Payments.FirstOrDefaultAsync(p => p.PaymentId == paymentResponse.Id);
         Assert.NotNull(payment);
         Assert.Equal(paymentResponse.Id, payment.PaymentId);
+    }
+
+    [Fact]
+    public async Task CreatePayment_ShouldReturnRejectedPaymentAndStoreInDatabase()
+    {
+        // Arrange
+        var paymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "2222405343248113",
+            ExpiryMonth = 01,
+            ExpiryYear = 2026,
+            Currency = "USD",
+            Amount = 60000,
+            Cvv = "456"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
+        var paymentResponse = await response.Content.ReadFromJsonAsync<PostPaymentResponse>();
+
+        // Assert
+        Assert.NotNull(paymentResponse);
+        Assert.Equal(8113, paymentResponse.CardNumberLastFour);
+        Assert.Equal(PaymentStatus.Rejected.ToString(), paymentResponse.Status);
+
+        await using var dbContext = new PaymentsDbContext(_testEnvironment.CreateDbContextOptions());
+        var payment = await dbContext.Payments.FirstOrDefaultAsync(p => p.PaymentId == paymentResponse.Id);
+        Assert.NotNull(payment);
+        Assert.Equal(paymentResponse.Id, payment.PaymentId);
+    }
+
+    [Fact]
+    public async Task GetPayment_ShouldReturnNotFound_WhenPaymentDoesNotExist()
+    {
+        
+    }
+    
+    [Fact]
+    public async Task GetPayment_ShouldReturnOkPayment_WhenPaymentExists()
+    {
+        
     }
 }

@@ -2,6 +2,7 @@ using AutoMapper;
 
 using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.ApiClient.Models.Request;
+using PaymentGateway.Api.Exceptions;
 using PaymentGateway.Api.Mappers;
 using PaymentGateway.Api.Models;
 using PaymentGateway.Api.Models.Entities;
@@ -34,25 +35,51 @@ public class PaymentService : IPaymentService
     public async Task<PostPaymentResponse> CreatePayment(PostPaymentRequest request)
     {
         var apiRequest = _mapper.Map<PostPaymentApiRequest>(request);
-        var apiResponse = await _simulatorApiClient.CreatePaymentAsync(apiRequest);
-        
         var paymentId = Guid.NewGuid();
 
-        var postPaymentResponse = new PostPaymentResponse
+        try
         {
-            Id = paymentId,
-            Status = _mapper.Map<PaymentStatus>(apiResponse).ToString(),
-            CardNumberLastFour = request.CardNumber.GetLastFourDigits(),
-            ExpiryMonth = request.ExpiryMonth,
-            ExpiryYear = request.ExpiryYear,
-            Currency = request.Currency,
-            Amount = request.Amount
-        };
+            _logger.LogInformation($"Creating payment with id {paymentId}");
+            var apiResponse = await _simulatorApiClient.CreatePaymentAsync(apiRequest);
+            var paymentResponse = new PostPaymentResponse
+            {
+                Id = paymentId,
+                Status = _mapper.Map<PaymentStatus>(apiResponse).ToString(),
+                CardNumberLastFour = request.CardNumber.GetLastFourDigits(),
+                ExpiryMonth = request.ExpiryMonth,
+                ExpiryYear = request.ExpiryYear,
+                Currency = request.Currency,
+                Amount = request.Amount
+            };
 
-        var paymentEntity = postPaymentResponse.ToPayment(_mapper.Map<PaymentStatus>(apiResponse));
-        await _paymentsRepository.CreatePaymentAsync(paymentEntity);
+            var paymentEntity = paymentResponse.ToPayment(_mapper.Map<PaymentStatus>(apiResponse));
+            await _paymentsRepository.CreatePaymentAsync(paymentEntity);
 
-        return postPaymentResponse;
+            return paymentResponse;
+        }
+        catch (ClientApiException ex)
+        {
+            // If there is a client exception type, we consider no payment could be created as invalid information
+            // was supplied to the payment gateway and therefore it has rejected the request without calling
+            // the acquiring bank. Therefore, it will be stored and returned as Rejected. 
+            _logger.LogError(ex, "Payment rejected due to client error.");
+
+            var rejectedPayment = new PostPaymentResponse
+            {
+                Id = paymentId,
+                Status = PaymentStatus.Rejected.ToString(),
+                CardNumberLastFour = request.CardNumber.GetLastFourDigits(),
+                ExpiryMonth = request.ExpiryMonth,
+                ExpiryYear = request.ExpiryYear,
+                Currency = request.Currency,
+                Amount = request.Amount
+            };
+
+            var rejectedEntity = rejectedPayment.ToPayment(PaymentStatus.Rejected);
+            await _paymentsRepository.CreatePaymentAsync(rejectedEntity);
+
+            return rejectedPayment;
+        }
     }
 
     public async Task<GetPaymentResponse?> GetPayment(Guid paymentId)

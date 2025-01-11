@@ -28,7 +28,7 @@ public class TestEnvironment : IAsyncLifetime
             .WithPassword("password")
             .Build();
         
-        var impostersPath = Path.GetFullPath("../../../imposters");
+        var impostersPath = Path.GetFullPath("../../../Helpers/imposters");
 
         if (!Directory.Exists(impostersPath))
         {

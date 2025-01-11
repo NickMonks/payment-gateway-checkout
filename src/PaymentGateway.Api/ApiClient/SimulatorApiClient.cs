@@ -20,23 +20,18 @@ public class SimulatorApiClient
 
     public async Task<PostPaymentApiResponse> CreatePaymentAsync(PostPaymentApiRequest request)
     {
-        _logger.LogInformation("Creating payment");
-        var bodyRequest = new StringContent(
+        _logger.LogInformation("Sending payment creation request");
+
+        var bodyContent = new StringContent(
             JsonSerializer.Serialize(request),
             Encoding.UTF8,
             "application/json"
         );
-        
-        var response = await _httpClient.PostAsync("/payments",bodyRequest);
-        response.EnsureSuccessStatusCode();
-        
+
+        var response = await _httpClient.PostAsync("/payments", bodyContent);
         var responseString = await response.Content.ReadAsStringAsync();
-        var postPaymentResponse = JsonSerializer.Deserialize<PostPaymentApiResponse>(responseString);
-        if (postPaymentResponse == null)
-        {
-            throw new InvalidOperationException("Deserialization failed: JSON returned null.");
-        }
-        
-        return postPaymentResponse;
+
+        return JsonSerializer.Deserialize<PostPaymentApiResponse>(responseString)
+               ?? throw new InvalidOperationException("Deserialization returned null");
     }
 }

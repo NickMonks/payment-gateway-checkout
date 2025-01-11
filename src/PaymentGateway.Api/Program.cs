@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.Exceptions;
+using PaymentGateway.Api.Handlers;
 using PaymentGateway.Api.Persistence.Repositories;
 using PaymentGateway.Api.Services;
 using PaymentGateway.Api.Services.Contracts;
@@ -25,13 +26,16 @@ builder.Services.AddLogging();
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient<SimulatorApiClient>(nameof(SimulatorApiClient), client =>
-{
-    var simulatorApiSettings = builder.Configuration
-        .GetSection(nameof(SimulatorApiSettings))
-        .Get<SimulatorApiSettings>() ?? throw new NullReferenceException();
-    
-    client.BaseAddress = new Uri(simulatorApiSettings.BaseUri);
-});
+    {
+        var simulatorApiSettings = builder.Configuration
+            .GetSection(nameof(SimulatorApiSettings))
+            .Get<SimulatorApiSettings>() ?? throw new NullReferenceException();
+
+        client.BaseAddress = new Uri(simulatorApiSettings.BaseUri);
+    })
+    .AddHttpMessageHandler<ApiExceptionHandler>();
+builder.Services.AddTransient<ApiExceptionHandler>();
+
 
 builder.Services.AddDbContext<PaymentsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -48,7 +52,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.UseMiddleware<ExceptionsMiddleware>();
+//app.UseMiddleware<ExceptionsMiddleware>();
 app.MapControllers();
 
 app.Run();
