@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway.IntegrationTest;
+﻿namespace PaymentGateway.Api.IntegrationTest;
 
 public class UnitTest1
 {

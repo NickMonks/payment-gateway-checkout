@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 
 namespace PaymentGateway.Api.Exceptions;
@@ -32,31 +33,28 @@ public class ExceptionsMiddleware
 
         int statusCode;
         string message;
+        HttpStatusCode? httpRequestException;
 
-        if (exception is HttpRequestException httpRequestException)
+        if (exception is HttpRequestException)
         {
-            if (context.Response.StatusCode == StatusCodes.Status400BadRequest)
+            httpRequestException = (exception as HttpRequestException).StatusCode;
+            statusCode = httpRequestException switch
             {
-                throw new BadRequestException("The request was invalid or cannot be served.");
-            }
-            else if (context.Response.StatusCode == StatusCodes.Status404NotFound)
-            {
-                throw new NotFoundException("The requested resource was not found.");
-            }
-            else if (context.Response.StatusCode == StatusCodes.Status500InternalServerError)
-            {
-                throw new InternalServerErrorException("An internal server error occurred.");
-            }
-            else
-            {
-                statusCode = StatusCodes.Status500InternalServerError;
-                message = "An unexpected error occurred.";
-            }
+                HttpStatusCode.Unauthorized => StatusCodes.Status401Unauthorized,
+                HttpStatusCode.Forbidden => StatusCodes.Status403Forbidden,
+                HttpStatusCode.NotFound => StatusCodes.Status404NotFound,
+                HttpStatusCode.BadRequest => StatusCodes.Status400BadRequest,
+                HttpStatusCode.InternalServerError => StatusCodes.Status500InternalServerError,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            message = exception.Message;
         }
         else
         {
+            // For unexpected exceptions, return a generic message
             statusCode = StatusCodes.Status500InternalServerError;
-            message = exception.Message;
+            message = "An unexpected error occurred.";
         }
 
         context.Response.StatusCode = statusCode;
