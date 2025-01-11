@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.Models;
+using PaymentGateway.Api.Models.Entities;
 using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Services;
@@ -18,10 +20,16 @@ public class PaymentsControllerTests : IClassFixture<WebApplicationFactory<Progr
 {
     private readonly HttpClient _client;
     private readonly TestEnvironment _testEnvironment;
+    private readonly IMemoryCache _memoryCache;
 
-    public PaymentsControllerTests(WebApplicationFactory<Program> factory, TestEnvironment testEnvironment)
+    public PaymentsControllerTests(
+        WebApplicationFactory<Program> factory, 
+        TestEnvironment testEnvironment)
     {
         _testEnvironment = testEnvironment;
+        
+        var sharedMemoryCache = new MemoryCache(new MemoryCacheOptions());
+        _memoryCache = sharedMemoryCache;
 
         _client = factory.WithWebHostBuilder(builder =>
         {
@@ -34,6 +42,9 @@ public class PaymentsControllerTests : IClassFixture<WebApplicationFactory<Progr
                 {
                     client.BaseAddress = new Uri(testEnvironment.SimulatorBaseUrl);
                 });
+                
+                services.AddSingleton<IMemoryCache>(sharedMemoryCache);
+
             });
         }).CreateClient();
     }
@@ -224,12 +235,81 @@ public class PaymentsControllerTests : IClassFixture<WebApplicationFactory<Progr
     [Fact]
     public async Task GetPayment_ShouldReturnNotFound_WhenPaymentDoesNotExist()
     {
-        
+        // Arrange
+        var randomPaymentId = Guid.NewGuid();
+
+        // Act
+        var response = await _client.GetAsync($"/api/Payments/{randomPaymentId}");
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
     }
     
     [Fact]
     public async Task GetPayment_ShouldReturnOkPayment_WhenPaymentExists()
     {
+        // Arrange
+        var paymentId = Guid.NewGuid();
+        var paymentEntity = new Payment
+        {
+            PaymentId = paymentId,
+            CardNumberFourDigits = 8877,
+            ExpirationMonth = "04",
+            ExpirationYear = "2025",
+            Currency = Currency.GBP,
+            Amount = 100,
+            PaymentStatus = PaymentStatus.Authorized
+        };
+
+        await using (var dbContext = new PaymentsDbContext(_testEnvironment.CreateDbContextOptions()))
+        {
+            dbContext.Payments.Add(paymentEntity);
+            await dbContext.SaveChangesAsync();
+        }
+
+        // Act
+        var response = await _client.GetAsync($"/api/Payments/{paymentId}");
+        var paymentResponse = await response.Content.ReadFromJsonAsync<GetPaymentResponse>();
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(paymentResponse);
+        Assert.Equal(paymentId, paymentResponse.Id);
+        Assert.Equal(paymentEntity.CardNumberFourDigits, paymentResponse.CardNumberLastFour);
+        Assert.Equal(paymentEntity.Currency.ToString(), paymentResponse.Currency);
+        Assert.Equal(paymentEntity.Amount, paymentResponse.Amount);
+        Assert.Equal(paymentEntity.PaymentStatus.ToString(), paymentResponse.Status);
+    }
+    
+    [Fact]
+    public async Task GetPayment_ShouldReturnOkPayment_Cached()
+    {
+        // Arrange
+        var paymentId = Guid.NewGuid();
+        var paymentResponse = new GetPaymentResponse
+        {
+            Id = paymentId,
+            CardNumberLastFour = 8877,
+            ExpiryMonth = "04",
+            ExpiryYear = "2025",
+            Currency = "GBP",
+            Amount = 100,
+            Status = PaymentStatus.Authorized.ToString()
+        };
         
+        _memoryCache.Set(paymentId, paymentResponse);
+
+        // Act
+        var response = await _client.GetAsync($"/api/Payments/{paymentId}");
+        var cachedPaymentResponse = await response.Content.ReadFromJsonAsync<GetPaymentResponse>();
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(cachedPaymentResponse);
+        Assert.Equal(paymentResponse.Id, cachedPaymentResponse.Id);
+        Assert.Equal(paymentResponse.CardNumberLastFour, cachedPaymentResponse.CardNumberLastFour);
+        Assert.Equal(paymentResponse.Currency, cachedPaymentResponse.Currency);
+        Assert.Equal(paymentResponse.Amount, cachedPaymentResponse.Amount);
+        Assert.Equal(paymentResponse.Status, cachedPaymentResponse.Status);
     }
 }

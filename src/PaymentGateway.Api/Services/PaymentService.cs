@@ -1,5 +1,7 @@
 using AutoMapper;
 
+using Microsoft.Extensions.Caching.Memory;
+
 using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.ApiClient.Models.Request;
 using PaymentGateway.Api.Exceptions;
@@ -19,17 +21,20 @@ public class PaymentService : IPaymentService
     private readonly SimulatorApiClient _simulatorApiClient;
     private readonly IPaymentsRepository _paymentsRepository;
     private readonly IMapper _mapper;
+    private readonly IMemoryCache _cache;
 
     public PaymentService(
         ILogger<PaymentService> logger, 
         SimulatorApiClient simulatorApiClient, 
         IMapper mapper, 
-        IPaymentsRepository paymentsRepository)
+        IPaymentsRepository paymentsRepository, 
+        IMemoryCache cache)
     {
         _logger = logger;
         _simulatorApiClient = simulatorApiClient;
         _mapper = mapper;
         _paymentsRepository = paymentsRepository;
+        _cache = cache;
     }
     
     public async Task<PostPaymentResponse> CreatePayment(PostPaymentRequest request)
@@ -84,7 +89,24 @@ public class PaymentService : IPaymentService
 
     public async Task<GetPaymentResponse?> GetPayment(Guid paymentId)
     {
+        if (_cache.TryGetValue(paymentId, out GetPaymentResponse? cachedPayment))
+        {
+            _logger.LogInformation($"Payment with ID {paymentId} retrieved from cache.");
+            return cachedPayment;
+        }
+
+        _logger.LogInformation($"Payment with ID {paymentId} not found in cache. Retrieving from database.");
         var paymentDb = await _paymentsRepository.GetPaymentByIdAsync(paymentId);
-        return paymentDb?.ToPayment();
+
+        if (paymentDb == null)
+        {
+            return null;
+        }
+
+        var paymentResponse = paymentDb.ToPayment();
+
+        _cache.Set(paymentId, paymentResponse, TimeSpan.FromMinutes(10));
+
+        return paymentResponse;
     }
 }

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using DotNet.Testcontainers.Builders;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 using PaymentGateway.Api.Services;
 
