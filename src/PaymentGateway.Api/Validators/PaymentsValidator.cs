@@ -19,7 +19,7 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
         
         RuleFor(x => new { x.ExpiryMonth, x.ExpiryYear })
             .Must(x => IsValidDate(x.ExpiryMonth, x.ExpiryYear))
-            .WithMessage("Expiry date must be in the future.");
+            .WithMessage("Expiry date cannot be in the past");
         
         RuleFor(x => x.Amount)
             .NotEmpty().GreaterThan(0).WithMessage("Amount must be greater than zero");
@@ -29,7 +29,7 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
             .Must(cvv => cvv.ToString().Length == 3)
             .WithMessage("Currency should be 3 character long.")
             .Must(BeValidCurrency)
-            .WithMessage("Currency should be 3 character long.");
+            .WithMessage("Currency is not valid.");
         
         RuleFor(x => x.Cvv)
             .NotEmpty()
@@ -55,7 +55,7 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
 
     private bool BeValidCurrency(string currency)
     {
-        return Enum.TryParse(typeof(Currency), currency, true, out _);
+        return Enum.IsDefined(typeof(Currency), currency);
     }
     
 }

@@ -5,6 +5,7 @@ using DotNet.Testcontainers.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
+using PaymentGateway.Api.Persistence;
 using PaymentGateway.Api.Services;
 
 using Testcontainers.PostgreSql;

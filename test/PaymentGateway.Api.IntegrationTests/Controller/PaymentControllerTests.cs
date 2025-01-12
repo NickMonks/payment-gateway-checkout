@@ -1,22 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.Models;
 using PaymentGateway.Api.Models.Entities;
 using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Models.Responses;
-using PaymentGateway.Api.Services;
+using PaymentGateway.Api.Persistence;
 
-namespace PaymentGateway.Api.IntegrationTest.Controller;
+namespace PaymentGateway.Api.IntegrationTests.Controller;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http.Json;
 using Xunit;
 
-public class PaymentsControllerTests : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestEnvironment>
+public class PaymentsControllerTests : 
+    IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestEnvironment>
 {
     private readonly HttpClient _client;
     private readonly TestEnvironment _testEnvironment;

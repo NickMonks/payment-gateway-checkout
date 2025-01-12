@@ -2,8 +2,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using PaymentGateway.Api.ApiClient;
-using PaymentGateway.Api.Exceptions;
 using PaymentGateway.Api.Handlers;
+using PaymentGateway.Api.Middlewares;
+using PaymentGateway.Api.Persistence;
 using PaymentGateway.Api.Persistence.Repositories;
 using PaymentGateway.Api.Services;
 using PaymentGateway.Api.Services.Contracts;
@@ -13,7 +14,6 @@ using PaymentGateway.Api.Validators;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,7 +25,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddLogging();
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddHttpClient<SimulatorApiClient>(nameof(SimulatorApiClient), client =>
+builder.Services.AddHttpClient<IApiClient, SimulatorApiClient>(nameof(SimulatorApiClient), client =>
     {
         var simulatorApiSettings = builder.Configuration
             .GetSection(nameof(SimulatorApiSettings))
@@ -52,7 +52,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-//app.UseMiddleware<ExceptionsMiddleware>();
+app.UseMiddleware<ExceptionsMiddleware>();
 app.MapControllers();
 
 app.Run();

@@ -2,13 +2,7 @@ using System.Net;
 
 namespace PaymentGateway.Api.Exceptions;
 
-public class ClientApiException : Exception
+public class ClientApiException(string message, HttpStatusCode statusCode) : Exception(message)
 {
-    public HttpStatusCode StatusCode { get; }
-
-    public ClientApiException(string message, HttpStatusCode statusCode)
-        : base(message)
-    {
-        StatusCode = statusCode;
-    }
+    public HttpStatusCode StatusCode { get; } = statusCode;
 }

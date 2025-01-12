@@ -7,7 +7,7 @@ using PaymentGateway.Api.Models.Responses;
 
 namespace PaymentGateway.Api.ApiClient;
 
-public class SimulatorApiClient
+public class SimulatorApiClient : IApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<SimulatorApiClient> _logger;

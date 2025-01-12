@@ -3,23 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using PaymentGateway.Api.Models;
 using PaymentGateway.Api.Models.Entities;
 
-namespace PaymentGateway.Api.Services;
+namespace PaymentGateway.Api.Persistence;
 
-public class PaymentsDbContext :DbContext
+public class PaymentsDbContext(DbContextOptions<PaymentsDbContext> options) : DbContext(options)
 {
-    public PaymentsDbContext(DbContextOptions<PaymentsDbContext> options)
-        : base(options)
-    {
-    }
-
-    public DbSet<Payment?> Payments { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasPostgresEnum<PaymentStatus>();
         modelBuilder.HasPostgresEnum<Currency>();
-        modelBuilder.Entity<Payment>().HasIndex(u => u.PaymentId).IsUnique();
+        modelBuilder.Entity<Payment>()
+            .HasIndex(u => u.PaymentId)
+            .IsUnique();
         modelBuilder.Entity<Payment>()
             .Property(p => p.Currency)
             .HasConversion<string>();

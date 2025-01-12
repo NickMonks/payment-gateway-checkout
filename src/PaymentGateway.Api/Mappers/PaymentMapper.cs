@@ -6,7 +6,7 @@ namespace PaymentGateway.Api.Mappers;
 
 public static class PaymentMapper
 {
-    public static Payment? ToPayment(this PostPaymentResponse response, PaymentStatus status)
+    public static Payment ToPayment(this PostPaymentResponse response, PaymentStatus status)
     {
         return new Payment
         {
@@ -20,7 +20,7 @@ public static class PaymentMapper
         };
     }
     
-    public static GetPaymentResponse? ToPayment(this Payment response)
+    public static GetPaymentResponse TogGetPaymentResponse(this Payment response)
     {
         return new GetPaymentResponse
         {
