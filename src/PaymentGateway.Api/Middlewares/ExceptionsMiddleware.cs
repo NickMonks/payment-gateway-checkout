@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text.Json;
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace PaymentGateway.Api.Middlewares;
 
 public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddleware> logger)
@@ -13,7 +15,7 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An unhandled exception occurred.");
+            logger.LogError(ex, "An exception occurred: {Message}", ex.Message);
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -43,11 +45,17 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
         {
             // Fallback
             statusCode = StatusCodes.Status500InternalServerError;
-            message = "An unexpected error occurred.";
+            message = "Server Error";
         }
+        
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = message
+        };
 
         context.Response.StatusCode = statusCode;
-        var response = new { error = message };
-        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        await context.Response
+            .WriteAsJsonAsync(problemDetails);
     }
 }
