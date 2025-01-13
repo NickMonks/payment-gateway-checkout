@@ -12,6 +12,7 @@ services:
       - type: bind
         source: ./imposters
         target: /imposters
+  
   postgres-db:
     image: postgres:latest
     container_name: postgres-db
@@ -21,3 +22,20 @@ services:
       POSTGRES_DB: payments-db
     ports:
       - "5432:5432"
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres-db
+      - bank_simulator
+    environment:
+      POSTGRES_HOST: postgres-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: payments-db
+      ASPNETCORE_ENVIRONMENT: Production
+    ports:
+      - "8081:8080"
+      - "443:443"

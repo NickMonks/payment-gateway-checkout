@@ -51,7 +51,8 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = message
+            Title = message,
+            Detail = exception.Message
         };
 
         context.Response.StatusCode = statusCode;
