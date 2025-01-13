@@ -13,7 +13,6 @@ using PaymentGateway.Domain.Entities;
 using PaymentGateway.Domain.ValueObjects;
 using PaymentGateway.Shared.Models.ApiClient.Request;
 using PaymentGateway.Shared.Models.ApiClient.Response;
-using PaymentGateway.Shared.Models.Controller.Requests;
 using PaymentGateway.Shared.Models.Controller.Responses;
 using PaymentGateway.Shared.Models.DTO;
 
@@ -201,12 +200,12 @@ public class PaymentServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(getResponse.ExpiryYear, result.ExpiryYear);
-        Assert.Equal(getResponse.ExpiryMonth, result.ExpiryMonth);
-        Assert.Equal(getResponse.Status, result.Status);
-        Assert.Equal(getResponse.Currency, result.Currency);
-        Assert.Equal(getResponse.Amount, result.Amount);
-        Assert.Equal(getResponse.CardNumberLastFour, result.CardNumberLastFour);
+        Assert.Equal(getResponse.ExpiryYear, result?.ExpiryYear);
+        Assert.Equal(getResponse.ExpiryMonth, result?.ExpiryMonth);
+        Assert.Equal(getResponse.Status, result?.Status);
+        Assert.Equal(getResponse.Currency, result?.Currency);
+        Assert.Equal(getResponse.Amount, result?.Amount);
+        Assert.Equal(getResponse.CardNumberLastFour, result?.CardNumberLastFour);
         _repositoryMock.Verify(r => r.GetPaymentByIdAsync(paymentId), Times.Once);
     }
 

@@ -1,13 +1,13 @@
-using System;
 using AutoMapper;
+
 using PaymentGateway.Application.Profiles;
 using PaymentGateway.Domain.ValueObjects;
 using PaymentGateway.Shared.Models.ApiClient.Request;
 using PaymentGateway.Shared.Models.ApiClient.Response;
-using PaymentGateway.Shared.Models.Controller.Requests;
 using PaymentGateway.Shared.Models.Controller.Responses;
 using PaymentGateway.Shared.Models.DTO;
-using Xunit;
+
+namespace PaymentGateway.Api.Tests.Mappers;
 
 public class MappingProfileTests
 {
@@ -50,12 +50,12 @@ public class MappingProfileTests
         var authorizedResponse = new PostPaymentApiResponse
         {
             Authorized = true,
-            AuthorizationCode = null
+            AuthorizationCode = "1234-abcd-56789"
         };
         var declinedResponse = new PostPaymentApiResponse
         {
             Authorized = false,
-            AuthorizationCode = null
+            AuthorizationCode = "1234-abcd-56789"
         };
 
         // Act

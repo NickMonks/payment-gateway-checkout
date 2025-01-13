@@ -1,24 +1,18 @@
-using System.ComponentModel;
-
 using DotNet.Testcontainers.Builders;
-
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-
 using PaymentGateway.Api.Persistence;
-
 using Testcontainers.PostgreSql;
-
 using IContainer = DotNet.Testcontainers.Containers.IContainer;
+namespace PaymentGateway.Api.IntegrationTests.Helpers;
 
 public class TestEnvironment : IAsyncLifetime
 {
-    public PostgreSqlContainer PostgresContainer { get; set; }
-    public IContainer BankSimulatorContainer { get; set; }
+    private PostgreSqlContainer PostgresContainer { get; set; }
+    private IContainer BankSimulatorContainer { get; set; }
     public string SimulatorBaseUrl { get; set; }
     public string PostgresConnectionString { get; set; }
-    
-    public string BankSimulatorContainerName { get; set; } = new string("bank-simulator-" + Guid.NewGuid());
+
+    private string BankSimulatorContainerName { get; set; } = new string("bank-simulator-" + Guid.NewGuid());
     
     public TestEnvironment()
     {

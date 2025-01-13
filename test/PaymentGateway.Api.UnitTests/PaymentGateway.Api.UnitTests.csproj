@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Api\PaymentGateway.Api2\PaymentGateway.Api2.csproj" />
+    <ProjectReference Include="..\..\src\Api\PaymentGateway.Api\PaymentGateway.Api.csproj" />
     <ProjectReference Include="..\..\src\Core\PaymentGateway.Application\PaymentGateway.Application.csproj" />
     <ProjectReference Include="..\..\src\Core\PaymentGateway.Domain\PaymentGateway.Domain.csproj" />
     <ProjectReference Include="..\..\src\Core\PaymentGateway.Shared\PaymentGateway.Shared.csproj" />

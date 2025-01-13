@@ -28,7 +28,7 @@ namespace PaymentGateway.Api.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "payment_status", new[] { "authorized", "declined", "rejected" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("PaymentGateway.Api2.Models.Entities.Payment", b =>
+            modelBuilder.Entity("PaymentGateway.Api.Models.Entities.Payment", b =>
                 {
                     b.Property<Guid>("PaymentId")
                         .ValueGeneratedOnAdd()

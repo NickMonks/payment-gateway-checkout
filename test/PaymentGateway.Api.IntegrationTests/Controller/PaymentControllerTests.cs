@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
+using PaymentGateway.Api.IntegrationTests.Helpers;
 using PaymentGateway.Api.Models;
 using PaymentGateway.Api.Persistence;
 using PaymentGateway.Domain.Entities;
