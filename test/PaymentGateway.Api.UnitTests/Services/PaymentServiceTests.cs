@@ -3,16 +3,18 @@ using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PaymentGateway.Api.ApiClient;
-using PaymentGateway.Api.ApiClient.Models.Request;
-using PaymentGateway.Api.ApiClient.Models.Response;
-using PaymentGateway.Api.Exceptions;
 using PaymentGateway.Api.Models;
-using PaymentGateway.Api.Models.Entities;
-using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Api.Models.Responses;
-using PaymentGateway.Api.Profiles;
-using PaymentGateway.Api.Services;
+using PaymentGateway.Application.Contracts.ApiClient;
+using PaymentGateway.Application.Contracts.Persistence;
+using PaymentGateway.Application.Exceptions;
+using PaymentGateway.Application.Profiles;
+using PaymentGateway.Application.Services;
+using PaymentGateway.Domain.Entities;
+using PaymentGateway.Domain.ValueObjects;
+using PaymentGateway.Shared.Models.ApiClient.Request;
+using PaymentGateway.Shared.Models.ApiClient.Response;
+using PaymentGateway.Shared.Models.Controller.Responses;
+using PaymentGateway.Shared.Models.DTO;
 
 namespace PaymentGateway.Api.Tests.Services;
 
@@ -50,7 +52,7 @@ public class PaymentServiceTests
     public async Task CreatePayment_ShouldReturnExpectedResponse()
     {
         // Arrange
-        var request = new PostPaymentRequest
+        var request = new CreatePaymentRequestDto()
         {
             CardNumber = "2222405343248877",
             ExpiryMonth = 04,
@@ -100,7 +102,7 @@ public class PaymentServiceTests
     public async Task CreatePayment_ShouldStoreRejectedPayment_WhenClientExceptionOccurs()
     {
         // Arrange
-        var request = new PostPaymentRequest
+        var request = new CreatePaymentRequestDto()
         {
             CardNumber = "1234567890123456",
             ExpiryMonth = 12,
@@ -110,7 +112,13 @@ public class PaymentServiceTests
             Cvv = "123"
         };
 
-        var apiRequest = new PostPaymentApiRequest();
+        var apiRequest = new PostPaymentApiRequest
+        {
+            CardNumber = null,
+            ExpiryDate = null,
+            Currency = null,
+            Cvv = null
+        };
 
         _apiClientMock
             .Setup(c => c.CreatePaymentAsync(It.IsAny<PostPaymentApiRequest>()))
@@ -192,12 +200,12 @@ public class PaymentServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(getResponse.ExpiryYear, result.ExpiryYear);
-        Assert.Equal(getResponse.ExpiryMonth, result.ExpiryMonth);
-        Assert.Equal(getResponse.Status, result.Status);
-        Assert.Equal(getResponse.Currency, result.Currency);
-        Assert.Equal(getResponse.Amount, result.Amount);
-        Assert.Equal(getResponse.CardNumberLastFour, result.CardNumberLastFour);
+        Assert.Equal(getResponse.ExpiryYear, result?.ExpiryYear);
+        Assert.Equal(getResponse.ExpiryMonth, result?.ExpiryMonth);
+        Assert.Equal(getResponse.Status, result?.Status);
+        Assert.Equal(getResponse.Currency, result?.Currency);
+        Assert.Equal(getResponse.Amount, result?.Amount);
+        Assert.Equal(getResponse.CardNumberLastFour, result?.CardNumberLastFour);
         _repositoryMock.Verify(r => r.GetPaymentByIdAsync(paymentId), Times.Once);
     }
 

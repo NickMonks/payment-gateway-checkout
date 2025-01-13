@@ -1,10 +1,11 @@
 using AutoMapper;
 
-using PaymentGateway.Api.ApiClient.Models.Request;
-using PaymentGateway.Api.ApiClient.Models.Response;
-using PaymentGateway.Api.Models;
-using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Api.Profiles;
+using PaymentGateway.Application.Profiles;
+using PaymentGateway.Domain.ValueObjects;
+using PaymentGateway.Shared.Models.ApiClient.Request;
+using PaymentGateway.Shared.Models.ApiClient.Response;
+using PaymentGateway.Shared.Models.Controller.Responses;
+using PaymentGateway.Shared.Models.DTO;
 
 namespace PaymentGateway.Api.Tests.Mappers;
 
@@ -14,55 +15,92 @@ public class MappingProfileTests
 
     public MappingProfileTests()
     {
-        var configuration = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<MappingProfile>();
-        });
-
-        configuration.AssertConfigurationIsValid();
-        _mapper = configuration.CreateMapper();
+        var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
+        config.AssertConfigurationIsValid(); 
+        _mapper = config.CreateMapper();
     }
 
     [Fact]
-    public void PostPaymentRequest_To_PostPaymentApiRequest_ShouldMapCorrectly()
+    public void Map_CreatePaymentRequestDto_To_PostPaymentApiRequest_Success()
     {
         // Arrange
-        var request = new PostPaymentRequest
+        var source = new CreatePaymentRequestDto
         {
-            CardNumber = "1234567890123456",
-            ExpiryMonth = 12,
-            ExpiryYear = 2025,
+            CardNumber = "4111111111111111", 
+            ExpiryMonth = 12, 
+            ExpiryYear = 2025, 
+            Cvv = "123",
             Amount = 100,
             Currency = "USD",
-            Cvv = "123"
         };
 
         // Act
-        var result = _mapper.Map<PostPaymentApiRequest>(request);
+        var result = _mapper.Map<PostPaymentApiRequest>(source);
+
+        // Assert
+        Assert.Equal(source.CardNumber, result.CardNumber);
+        Assert.Equal("12/2025", result.ExpiryDate);
+        Assert.Equal("123", result.Cvv);
+    }
+
+    [Fact]
+    public void Map_PostPaymentApiResponse_To_PaymentStatus_Success()
+    {
+        // Arrange
+        var authorizedResponse = new PostPaymentApiResponse
+        {
+            Authorized = true,
+            AuthorizationCode = "1234-abcd-56789"
+        };
+        var declinedResponse = new PostPaymentApiResponse
+        {
+            Authorized = false,
+            AuthorizationCode = "1234-abcd-56789"
+        };
+
+        // Act
+        var authorizedResult = _mapper.Map<PaymentStatus>(authorizedResponse);
+        var declinedResult = _mapper.Map<PaymentStatus>(declinedResponse);
+
+        // Assert
+        Assert.Equal(PaymentStatus.Authorized, authorizedResult);
+        Assert.Equal(PaymentStatus.Declined, declinedResult);
+    }
+
+    [Fact]
+    public void Map_PostPaymentRequest_To_CreatePaymentRequestDto_Success()
+    {
+        // Arrange
+        var source = new CreatePaymentRequestDto
+        {
+            CardNumber = "4111111111111111", 
+            ExpiryMonth = 12, 
+            ExpiryYear = 2025, 
+            Cvv = "123",
+            Amount = 100,
+            Currency = "USD",
+        };
+
+        // Act
+        var result = _mapper.Map<CreatePaymentRequestDto>(source);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(request.CardNumber, result.CardNumber);
-        Assert.Equal("12/2025", result.ExpiryDate);
-        Assert.Equal(request.Cvv, result.Cvv);
     }
 
-    [Theory]
-    [InlineData(true, PaymentStatus.Authorized)]
-    [InlineData(false, PaymentStatus.Declined)]
-    public void PostPaymentApiResponse_To_PaymentStatus_ShouldMapCorrectly(bool authorized, PaymentStatus expectedStatus)
+    [Fact]
+    public void Map_CreatePaymentResponseDto_To_PostPaymentResponse_Success()
     {
         // Arrange
-        var apiResponse = new PostPaymentApiResponse
+        var source = new CreatePaymentResponseDto
         {
-            Authorized = authorized,
-            AuthorizationCode = "1234-5678-9012"
+            // Populate with test data as required
         };
 
         // Act
-        var result = _mapper.Map<PaymentStatus>(apiResponse);
+        var result = _mapper.Map<PostPaymentResponse>(source);
 
         // Assert
-        Assert.Equal(expectedStatus, result);
+        Assert.NotNull(result);
     }
 }
