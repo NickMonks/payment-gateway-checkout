@@ -1,11 +1,9 @@
-
-
 using PaymentGateway.Api.Models;
-using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Domain.Entities;
 using PaymentGateway.Domain.ValueObjects;
+using PaymentGateway.Shared.Models.Controller.Responses;
 
-namespace PaymentGateway.Application.Mappers;
+namespace PaymentGateway.Shared.Mappers;
 
 public static class PaymentMapper
 {

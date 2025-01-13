@@ -3,13 +3,14 @@ using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Api.Models.Responses;
+using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Application.Contracts.Services;
 using PaymentGateway.Application.Helpers;
-using PaymentGateway.Application.Mappers;
 using PaymentGateway.Domain.ValueObjects;
+using PaymentGateway.Shared.Mappers;
 using PaymentGateway.Shared.Models.ApiClient.Request;
+using PaymentGateway.Shared.Models.Controller.Responses;
+using PaymentGateway.Shared.Models.DTO;
 
 using ClientApiException = PaymentGateway.Application.Exceptions.ClientApiException;
 using IApiClient = PaymentGateway.Application.Contracts.ApiClient.IApiClient;
@@ -20,11 +21,11 @@ public class PaymentService(
     ILogger<PaymentService> logger,
     IApiClient simulatorApiClient,
     IMapper mapper,
-    Application.Contracts.Persistence.IPaymentsRepository paymentsRepository,
+    IPaymentsRepository paymentsRepository,
     IMemoryCache cache)
     : IPaymentService
 {
-    public async Task<PostPaymentResponse> CreatePayment(PostPaymentRequest request)
+    public async Task<CreatePaymentResponseDto> CreatePayment(CreatePaymentRequestDto request)
     {
         var apiRequest = mapper.Map<PostPaymentApiRequest>(request);
         var paymentId = Guid.NewGuid();
@@ -47,7 +48,7 @@ public class PaymentService(
             var paymentEntity = paymentResponse.ToPayment(mapper.Map<PaymentStatus>(apiResponse));
             await paymentsRepository.CreatePaymentAsync(paymentEntity);
 
-            return paymentResponse;
+            return mapper.Map<CreatePaymentResponseDto>(paymentResponse);
         }
         catch (ClientApiException ex)
         {
@@ -70,7 +71,7 @@ public class PaymentService(
             var rejectedEntity = rejectedPayment.ToPayment(PaymentStatus.Rejected);
             await paymentsRepository.CreatePaymentAsync(rejectedEntity);
 
-            return rejectedPayment;
+            return mapper.Map<CreatePaymentResponseDto>(rejectedEntity);
         }
     }
 

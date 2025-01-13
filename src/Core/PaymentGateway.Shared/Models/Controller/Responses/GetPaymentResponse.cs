@@ -1,4 +1,4 @@
-﻿namespace PaymentGateway.Api.Models.Responses;
+﻿namespace PaymentGateway.Shared.Models.Controller.Responses;
 
 public class GetPaymentResponse
 {

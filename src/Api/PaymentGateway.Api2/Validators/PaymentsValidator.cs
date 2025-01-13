@@ -1,14 +1,13 @@
 using FluentValidation;
 
 using PaymentGateway.Api.Models;
-using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Application;
+using PaymentGateway.Shared.Models.Controller.Requests;
 
 namespace PaymentGateway.Api.Validators;
 
-public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
+public abstract class PaymentsValidator : AbstractValidator<PostPaymentRequest>
 {
-    public PaymentsValidator()
+    protected PaymentsValidator()
     {
         RuleFor(x => x.CardNumber)
             .NotEmpty()

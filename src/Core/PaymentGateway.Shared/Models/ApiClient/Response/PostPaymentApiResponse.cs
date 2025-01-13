@@ -8,5 +8,5 @@ public class PostPaymentApiResponse
     public bool Authorized  { get; set; }
     
     [JsonPropertyName("authorization_code")]
-    public string AuthorizationCode { get; set; }
+    public required string AuthorizationCode { get; set; }
 }

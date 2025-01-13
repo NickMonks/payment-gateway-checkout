@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using PaymentGateway.Api.Persistence;
-using PaymentGateway.Persistence.Persistence.Contracts;
+using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Persistence.Persistence.Repositories;
 
 namespace PaymentGateway.Persistence;

@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace PaymentGateway.Api.Helpers;
+namespace PaymentGateway.Shared.Helpers;
 
 public static class StringExtensions
 {

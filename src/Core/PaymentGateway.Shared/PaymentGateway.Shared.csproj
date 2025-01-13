@@ -10,4 +10,8 @@
       <Folder Include="Models\ApiClient\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\PaymentGateway.Domain\PaymentGateway.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

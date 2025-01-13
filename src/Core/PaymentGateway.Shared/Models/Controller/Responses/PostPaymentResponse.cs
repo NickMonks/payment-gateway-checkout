@@ -1,12 +1,12 @@
-﻿namespace PaymentGateway.Api.Models.Responses;
+﻿namespace PaymentGateway.Shared.Models.Controller.Responses;
 
-public class GetPaymentResponse
+public class PostPaymentResponse
 {
     public Guid Id { get; set; }
     public string Status { get; set; }
     public int CardNumberLastFour { get; set; }
-    public string ExpiryMonth { get; set; }
-    public string ExpiryYear { get; set; }
+    public int ExpiryMonth { get; set; }
+    public int ExpiryYear { get; set; }
     public string Currency { get; set; }
     public int Amount { get; set; }
 }

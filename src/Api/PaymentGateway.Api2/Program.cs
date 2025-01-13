@@ -2,11 +2,13 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
+using PaymentGateway.Api;
 using PaymentGateway.Api.Handlers;
 using PaymentGateway.Api.Middlewares;
 using PaymentGateway.Api.Persistence;
 using PaymentGateway.Api.Settings;
 using PaymentGateway.Api.Validators;
+using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Application.Contracts.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,22 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddValidatorsFromAssemblyContaining<PaymentsValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddLogging();
+builder.Services.AddStartupServices(builder.Configuration);
+
+// var serviceProvider = builder.Services.BuildServiceProvider();
+//
+// using var scope = serviceProvider.CreateScope();
+// var repository = scope.ServiceProvider.GetService<IPaymentsRepository>();
+//
+// if (repository == null)
+// {
+//     Console.WriteLine("IPaymentsRepository could not be resolved!");
+// }
+// else
+// {
+//     Console.WriteLine("IPaymentsRepository resolved successfully.");
+// }
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

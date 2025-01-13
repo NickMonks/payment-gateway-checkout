@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using PaymentGateway.Api.Persistence;
+using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Domain.Entities;
-using PaymentGateway.Persistence.Persistence.Contracts;
 
 namespace PaymentGateway.Persistence.Persistence.Repositories;
 

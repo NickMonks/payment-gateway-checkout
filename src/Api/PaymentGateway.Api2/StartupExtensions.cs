@@ -9,8 +9,8 @@ public static class StartupExtensions
     public static IServiceCollection AddStartupServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddApiClientServices(configuration);
         services.AddPersistenceServices(configuration);
+        services.AddApiClientServices(configuration);
         services.AddApplicationServices(configuration);
         
         return services;

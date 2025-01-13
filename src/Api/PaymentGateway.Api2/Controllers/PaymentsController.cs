@@ -1,25 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 
-using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Api.Models.Responses;
+using Microsoft.AspNetCore.Mvc;
+
 using PaymentGateway.Application.Contracts.Services;
+using PaymentGateway.Shared.Models.Controller.Requests;
+using PaymentGateway.Shared.Models.Controller.Responses;
+using PaymentGateway.Shared.Models.DTO;
 
 namespace PaymentGateway.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentsController : Controller
+public class PaymentsController(IPaymentService paymentService, IMapper mapper) : Controller
 {
-    private readonly ILogger<PaymentsController> _logger;
-    private readonly IPaymentService _paymentService;
-
-    public PaymentsController(
-        IPaymentService paymentService, 
-        ILogger<PaymentsController> logger)
-    {
-        _paymentService = paymentService;
-        _logger = logger;
-    }
 
     [HttpGet("{id:guid}")]
     [ProducesDefaultResponseType]
@@ -27,7 +20,7 @@ public class PaymentsController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PostPaymentResponse?>> GetPaymentAsync(Guid id)
     {
-        var paymentResponse = await _paymentService.GetPayment(id);
+        var paymentResponse = await paymentService.GetPayment(id);
         if (paymentResponse == null)
         {
             return NotFound("Payment not found");
@@ -45,7 +38,9 @@ public class PaymentsController : Controller
             return BadRequest();
         }
 
-        var paymentResponse = await _paymentService.CreatePayment(request);
+        var paymentResponse = await paymentService.CreatePayment(
+            mapper.Map<CreatePaymentRequestDto>(request)
+            );
         return Ok(paymentResponse);
     }
 }

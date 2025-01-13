@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentGateway.Application"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentGateway.Shared", "src\Core\PaymentGateway.Shared\PaymentGateway.Shared.csproj", "{35E713F1-AF77-405B-910A-3AD522F60D33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentGateway.Api", "src\Api\PaymentGateway.Api\PaymentGateway.Api.csproj", "{A970019D-E540-4326-9862-4EDFCBC59D34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentGateway.Api2", "src\Api\PaymentGateway.Api2\PaymentGateway.Api2.csproj", "{A970019D-E540-4326-9862-4EDFCBC59D34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
