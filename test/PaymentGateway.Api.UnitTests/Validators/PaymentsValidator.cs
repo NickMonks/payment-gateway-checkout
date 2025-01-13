@@ -1,5 +1,5 @@
-using PaymentGateway.Api.Models.Requests;
 using PaymentGateway.Api.Validators;
+using PaymentGateway.Shared.Models.Controller.Requests;
 
 namespace PaymentGateway.Api.Tests.Validators;
 

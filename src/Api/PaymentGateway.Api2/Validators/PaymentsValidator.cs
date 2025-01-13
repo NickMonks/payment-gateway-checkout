@@ -5,9 +5,9 @@ using PaymentGateway.Shared.Models.Controller.Requests;
 
 namespace PaymentGateway.Api.Validators;
 
-public abstract class PaymentsValidator : AbstractValidator<PostPaymentRequest>
+public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
 {
-    protected PaymentsValidator()
+    public PaymentsValidator()
     {
         RuleFor(x => x.CardNumber)
             .NotEmpty()

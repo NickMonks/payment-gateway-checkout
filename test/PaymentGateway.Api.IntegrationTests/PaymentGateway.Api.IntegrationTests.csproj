@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\PaymentGateway.Api\PaymentGateway.Api.csproj" />
+        <ProjectReference Include="..\..\src\Api\PaymentGateway.Api2\PaymentGateway.Api2.csproj" />
     </ItemGroup>
 
     <Target Name="CopyTestHostDeps" AfterTargets="Build">

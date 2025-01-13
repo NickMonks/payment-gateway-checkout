@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-using PaymentGateway.Api.ApiClient;
 using PaymentGateway.Api.Models;
-using PaymentGateway.Api.Models.Entities;
-using PaymentGateway.Api.Models.Requests;
-using PaymentGateway.Api.Models.Responses;
 using PaymentGateway.Api.Persistence;
+using PaymentGateway.Domain.Entities;
+using PaymentGateway.Domain.ValueObjects;
+using PaymentGateway.Infrastructure.ApiClient;
+using PaymentGateway.Shared.Models.Controller.Requests;
+using PaymentGateway.Shared.Models.Controller.Responses;
 
 namespace PaymentGateway.Api.IntegrationTests.Controller;
 
@@ -145,7 +146,7 @@ public class PaymentsControllerTests :
 
 
     [Fact]
-    public async Task CreatePayment_ShouldReturnAuthorizedPaymentAndStoreInDatabase()
+    public async Task CreatePayment_ShouldReturn200_WhenAuthorizedPayment_AndStoreInDatabase()
     {
         // Arrange
         var paymentRequest = new PostPaymentRequest
@@ -166,6 +167,35 @@ public class PaymentsControllerTests :
         Assert.NotNull(paymentResponse);
         Assert.Equal(8877, paymentResponse.CardNumberLastFour);
         Assert.Equal(PaymentStatus.Authorized.ToString(), paymentResponse.Status);
+
+        await using var dbContext = new PaymentsDbContext(_testEnvironment.CreateDbContextOptions());
+        var payment = await dbContext.Payments.FirstOrDefaultAsync(p => p.PaymentId == paymentResponse.Id);
+        Assert.NotNull(payment);
+        Assert.Equal(paymentResponse.Id, payment.PaymentId);
+    }
+    
+    [Fact]
+    public async Task CreatePayment_ShouldReturn200_WhenDeclinedPayment_AndStoreInDatabase()
+    {
+        // Arrange
+        var paymentRequest = new PostPaymentRequest
+        {
+            CardNumber = "2222405343248112",
+            ExpiryMonth = 01,
+            ExpiryYear = 2026,
+            Currency = "USD",
+            Amount = 60000,
+            Cvv = "456"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
+        var paymentResponse = await response.Content.ReadFromJsonAsync<PostPaymentResponse>();
+
+        // Assert
+        Assert.NotNull(paymentResponse);
+        Assert.Equal(8112, paymentResponse.CardNumberLastFour);
+        Assert.Equal(PaymentStatus.Declined.ToString(), paymentResponse.Status);
 
         await using var dbContext = new PaymentsDbContext(_testEnvironment.CreateDbContextOptions());
         var payment = await dbContext.Payments.FirstOrDefaultAsync(p => p.PaymentId == paymentResponse.Id);
@@ -245,7 +275,7 @@ public class PaymentsControllerTests :
     }
     
     [Fact]
-    public async Task GetPayment_ShouldReturnOkPayment_WhenPaymentExists()
+    public async Task GetPayment_ShouldReturn200Ok_WhenPaymentExists()
     {
         // Arrange
         var paymentId = Guid.NewGuid();

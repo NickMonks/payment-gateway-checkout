@@ -1,4 +1,5 @@
-using PaymentGateway.Api.Helpers;
+
+using PaymentGateway.Shared.Helpers;
 
 namespace PaymentGateway.Api.Tests.Helpers;
 

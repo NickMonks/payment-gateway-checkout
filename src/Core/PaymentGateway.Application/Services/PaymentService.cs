@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 
 using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Application.Contracts.Services;
-using PaymentGateway.Application.Helpers;
 using PaymentGateway.Domain.ValueObjects;
+using PaymentGateway.Shared.Helpers;
 using PaymentGateway.Shared.Mappers;
 using PaymentGateway.Shared.Models.ApiClient.Request;
 using PaymentGateway.Shared.Models.Controller.Responses;
@@ -71,7 +71,7 @@ public class PaymentService(
             var rejectedEntity = rejectedPayment.ToPayment(PaymentStatus.Rejected);
             await paymentsRepository.CreatePaymentAsync(rejectedEntity);
 
-            return mapper.Map<CreatePaymentResponseDto>(rejectedEntity);
+            return mapper.Map<CreatePaymentResponseDto>(rejectedPayment);
         }
     }
 

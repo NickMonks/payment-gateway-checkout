@@ -2,11 +2,12 @@ using System.Net;
 using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
-using PaymentGateway.Api.ApiClient;
-using PaymentGateway.Api.ApiClient.Models.Request;
-using PaymentGateway.Api.ApiClient.Models.Response;
-using PaymentGateway.Api.Exceptions;
 using PaymentGateway.Api.Handlers;
+using PaymentGateway.Application.Exceptions;
+using PaymentGateway.Infrastructure.ApiClient;
+using PaymentGateway.Shared.Models.ApiClient.Request;
+using PaymentGateway.Shared.Models.ApiClient.Response;
+
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
