@@ -29,17 +29,25 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
         
         if (exception is HttpRequestException httpRequestException)
         {
-            var httpStatusCode = (HttpStatusCode)httpRequestException.StatusCode!;
-
-            statusCode = httpStatusCode switch
+            if (httpRequestException.StatusCode == null)
             {
-                HttpStatusCode.Unauthorized => StatusCodes.Status401Unauthorized,
-                HttpStatusCode.Forbidden => StatusCodes.Status403Forbidden,
-                HttpStatusCode.NotFound => StatusCodes.Status404NotFound,
-                HttpStatusCode.BadRequest => StatusCodes.Status400BadRequest,
-                _ => StatusCodes.Status500InternalServerError
-            };
-            message = httpRequestException.Message;
+                statusCode = StatusCodes.Status500InternalServerError; // Default status for null
+                message = "Unexpected error occurred";
+            }
+            else
+            {
+                var httpStatusCode = (HttpStatusCode) httpRequestException.StatusCode;
+
+                statusCode = httpStatusCode switch
+                {
+                    HttpStatusCode.Unauthorized => StatusCodes.Status401Unauthorized,
+                    HttpStatusCode.Forbidden => StatusCodes.Status403Forbidden,
+                    HttpStatusCode.NotFound => StatusCodes.Status404NotFound,
+                    HttpStatusCode.BadRequest => StatusCodes.Status400BadRequest,
+                    _ => StatusCodes.Status500InternalServerError
+                };
+                message = httpRequestException.Message;
+            }
         }
         else
         {
