@@ -2,7 +2,7 @@
 
 ![img.png](img.png)
 
-This is the .NET version of the Payment Gateway challenge. If you haven't already read this [README.md](https://github.com/cko-recruitment/) on the details of this exercise, please do so now. 
+This is the .NET version of the Payment Gateway challenge.
 
 # How to run
 
@@ -32,6 +32,7 @@ curl -X POST http://localhost:8081/api/Payments \
 curl -X GET http://localhost:8081/api/Payments/<YOUR-PAYMENT-ID> \
 -H "Content-Type: application/json" 
 ```
+
 # Functional Requirements
 
 The aim of this project/service is to cover the functional requirements described in [here](https://github.com/cko-recruitment/).
@@ -51,7 +52,42 @@ with some justification on the why.
 
 - The service should be 
 
-### Observability
+# Technical Details
+
+## Architecture
+
+```
+src
+├── Api
+│   └── PaymentGateway.Api
+├── Core
+│   ├── PaymentGateway.Application
+│   ├── PaymentGateway.Domain
+│   └── PaymentGateway.Shared
+├── Infrastructure
+│   ├── PaymentGateway.ApiClient
+│   └── PaymentGateway.Persistence
+test
+```
+When developing this services I tried to mimic a _Clean Architecture_ structure. The reason is because I wanted to organize code into layers and enforce a clear separation of concerns to make the code more scalabile, maintainabile, and testable. 
+
+Honestly, _Clean architecture_ might be a bit of an overkill for this project, but I believe is good practise to do so in general, specially if the project is gonna grow with more engineers working on it, so I decided to refactor my original code to accomodate it. 
+Here's a breakdown of the layers:
+
+1. **Api Layer (PaymentGateway.Api)**
+   - This layer acts as the entry point for the payment gateway. 
+   - responsible for interacting with external clients, handling HTTP requests, and returning responses.
+2. **Core Layer** : This is the business logic layer. Divided into three subproject: 
+   - **PaymentGateway.Application**: Contains the application service layer.
+Responsible for orchestrating domain logic and managing workflows.
+Interfaces (e.g., IPaymentsRepository) define contracts for infrastructure dependencies.
+   - **PaymentGateway.Domain**: The core business logic and entities reside here. This layer doesn't depend on any external frameworks or libraries, but rather all dependent from this layer. 
+   - **PaymentGateway.Shared**: For cross-cutting concerns like utilities, observability, or shared logic between different layers. I created this layer avoid duplication and centralize reusable code.
+3. **Infrastructure Layer**
+   - **PaymentGateway.ApiClient**: code for interacting with external APIs or third-party services (in our case, the Mount Bank container).
+   - **PaymentGateway.Persistence**: Responsible for data access and persistence: repositories, database context, and migrations.
+
+## Observability
 Distributed tracing is critical for applications, especially those based on microservices architectures, where requests often traverse multiple services. 
 Thanks to OpenTelemetry, it can provide insight into the flow of requests, and help diagnose performance bottlenecks, errors, and improve overall system reliability.
 
@@ -60,13 +96,16 @@ an MVP project this should cover everything. Currently we have a very simple Obs
 
 When running the `docker-compose.yml`, you should be able see the traces of each request under http://localhost:16686. 
 
-### Data Storage
+## Data Storage
 
+TODO
 
+## Testing
 
-### Testing
+Inside the `/test` folder, I setup two testing project: `UnitTest` and `IntegrationTest`. 
+I tried to follow the [testing pyramid](https://martinfowler.com/articles/practical-test-pyramid.html) approach: unit tests for Core layers and integration tests for API and Infrastructure.
 
-Inside the `/test` folder, I setup two testing project: `UnitTest` and `IntegrationTest`. Some description provided below:
+Some description provided below:
 - **Unit tests:** 
   - I tried to cover  test the smallest pieces of code in isolation directly. For example, I tested the methods on the extension methods, the mappers, and the validators directly.
   - On this project, I also test the service layer. The reason why is in here and not integration test project, is because I focused on testing the core service logic. The dependencies are directly mocked using Moq and WireMock (for the Simulator API client).
