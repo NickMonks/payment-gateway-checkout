@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # Bank Simulator - 3rd party API Mock
   bank_simulator:
     container_name: bank_simulator
     image: bbyars/mountebank:2.8.1
@@ -12,7 +13,8 @@ services:
       - type: bind
         source: ./imposters
         target: /imposters
-  
+        
+  #PostgreSQL - data storage
   postgres-db:
     image: postgres:latest
     container_name: postgres-db
@@ -22,6 +24,19 @@ services:
       POSTGRES_DB: payments-db
     ports:
       - "5432:5432"
+
+  # Jaeger - Observability Exporter
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "13133:13133"
+      - "16686:16686"
+      - "4317:4317"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=debug
+  
+  #Payment Gateway 
   api:
     build:
       context: .
@@ -29,6 +44,7 @@ services:
     depends_on:
       - postgres-db
       - bank_simulator
+      - jaeger
     environment:
       POSTGRES_HOST: postgres-db
       POSTGRES_PORT: 5432

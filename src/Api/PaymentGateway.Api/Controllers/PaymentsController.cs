@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
 
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-
+using OpenTelemetry.Trace;
 using PaymentGateway.Application.Contracts.Services;
 using PaymentGateway.Shared.Models.Controller.Requests;
 using PaymentGateway.Shared.Models.Controller.Responses;
@@ -11,8 +12,16 @@ namespace PaymentGateway.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentsController(IPaymentService paymentService, IMapper mapper) : Controller
+public class PaymentsController : Controller
 {
+    private readonly IMapper _mapper;
+    private readonly IPaymentService _paymentService;
+
+    public PaymentsController(IPaymentService paymentService, IMapper mapper)
+    {
+        _paymentService = paymentService;
+        _mapper = mapper;
+    }
 
     [HttpGet("{id:guid}")]
     [ProducesDefaultResponseType]
@@ -20,11 +29,13 @@ public class PaymentsController(IPaymentService paymentService, IMapper mapper) 
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PostPaymentResponse?>> GetPaymentAsync(Guid id)
     {
-        var paymentResponse = await paymentService.GetPayment(id);
+        var paymentResponse = await _paymentService.GetPayment(id);
+
         if (paymentResponse == null)
         {
             return NotFound("Payment not found");
         }
+
         return Ok(paymentResponse);
     }
 
@@ -37,10 +48,9 @@ public class PaymentsController(IPaymentService paymentService, IMapper mapper) 
         {
             return BadRequest();
         }
-
-        var paymentResponse = await paymentService.CreatePayment(
-            mapper.Map<CreatePaymentRequestDto>(request)
-            );
+        
+        var paymentDto = _mapper.Map<CreatePaymentRequestDto>(request);
+        var paymentResponse = await _paymentService.CreatePayment(paymentDto);
         return Ok(paymentResponse);
     }
 }

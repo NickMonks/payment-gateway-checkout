@@ -1,8 +1,6 @@
 using AutoMapper;
-
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-
 using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Application.Contracts.Services;
 using PaymentGateway.Domain.ValueObjects;
@@ -11,6 +9,7 @@ using PaymentGateway.Shared.Mappers;
 using PaymentGateway.Shared.Models.ApiClient.Request;
 using PaymentGateway.Shared.Models.Controller.Responses;
 using PaymentGateway.Shared.Models.DTO;
+using PaymentGateway.Shared.Observability;
 
 using ClientApiException = PaymentGateway.Application.Exceptions.ClientApiException;
 using IApiClient = PaymentGateway.Application.Contracts.ApiClient.IApiClient;
@@ -27,12 +26,12 @@ public class PaymentService(
 {
     public async Task<CreatePaymentResponseDto> CreatePayment(CreatePaymentRequestDto request)
     {
+        using var activity = DiagnosticsConfig.Source.StartActivity("PaymentService.CreatePayment");
         var apiRequest = mapper.Map<PostPaymentApiRequest>(request);
         var paymentId = Guid.NewGuid();
-
+        
         try
         {
-            logger.LogInformation($"Creating payment with id {paymentId}");
             var apiResponse = await simulatorApiClient.CreatePaymentAsync(apiRequest);
             var paymentResponse = new PostPaymentResponse
             {
@@ -56,7 +55,8 @@ public class PaymentService(
             // was supplied to the payment gateway, and therefore it has rejected the request without calling
             // the acquiring bank. Therefore, it will be stored and returned as Rejected. 
             logger.LogWarning(ex, "Payment rejected due to client error.");
-
+            activity?.ClientApiExceptionEvent(paymentId.ToString());
+            
             var rejectedPayment = new PostPaymentResponse
             {
                 Id = paymentId,
@@ -77,12 +77,16 @@ public class PaymentService(
 
     public async Task<GetPaymentResponse?> GetPayment(Guid paymentId)
     {
+        using var activity = DiagnosticsConfig.Source.StartActivity("PaymentService.GetPayment");
+
         if (cache.TryGetValue(paymentId, out GetPaymentResponse? cachedPayment))
         {
+            activity?.CacheEvent(paymentId.ToString(), true);
             logger.LogInformation($"Payment with ID {paymentId} retrieved from cache.");
             return cachedPayment;
         }
-
+        
+        activity?.CacheEvent(paymentId.ToString(), false);
         logger.LogInformation($"Payment with ID {paymentId} not found in cache. Retrieving from database.");
         var paymentDb = await paymentsRepository.GetPaymentByIdAsync(paymentId);
 

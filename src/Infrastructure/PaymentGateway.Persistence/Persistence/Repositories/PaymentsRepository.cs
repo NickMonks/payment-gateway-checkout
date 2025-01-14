@@ -3,27 +3,25 @@
 using PaymentGateway.Api.Persistence;
 using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Domain.Entities;
+using PaymentGateway.Shared.Observability;
 
 namespace PaymentGateway.Persistence.Persistence.Repositories;
 
-public class PaymentsRepository : IPaymentsRepository
+public class PaymentsRepository(PaymentsDbContext context) : IPaymentsRepository
 {
-    private readonly PaymentsDbContext _context;
-
-    public PaymentsRepository(PaymentsDbContext context)
+    public async Task<Payment> CreatePaymentAsync(Payment payment)
     {
-        _context = context;
-    }
-    
-    public async Task<Payment?> CreatePaymentAsync(Payment? payment)
-    {
-        await _context.Payments.AddAsync(payment);
-        await _context.SaveChangesAsync();
+        using var activity = DiagnosticsConfig.Source.StartActivity("Store Payment");
+        activity?.SetPayment(payment);
+        
+        await context.Payments.AddAsync(payment);
+        await context.SaveChangesAsync();
         return payment;
     }
 
     public async Task<Payment?> GetPaymentByIdAsync(Guid paymentId)
     {
-        return await _context.Payments.FirstOrDefaultAsync(u => u.PaymentId == paymentId);
+        using var activity = DiagnosticsConfig.Source.StartActivity("Get Payment");
+        return await context.Payments.FirstOrDefaultAsync(u => u.PaymentId == paymentId);
     }
 }

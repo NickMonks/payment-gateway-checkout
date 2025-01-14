@@ -2,14 +2,12 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using PaymentGateway.Api;
-using PaymentGateway.Api.Handlers;
 using PaymentGateway.Api.Middlewares;
 using PaymentGateway.Api.Persistence;
-using PaymentGateway.Api.Settings;
 using PaymentGateway.Api.Validators;
-using PaymentGateway.Application.Contracts.Persistence;
-using PaymentGateway.Application.Contracts.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +18,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<PaymentsValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddLogging();
 builder.Services.AddStartupServices(builder.Configuration);
+builder.Services.AddObservability(builder.Configuration);
 
 var app = builder.Build();
 
@@ -45,8 +44,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
-
+app.UseMiddleware<OpenTelemetryMiddleware>();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionsMiddleware>();
 app.MapControllers();
