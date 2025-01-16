@@ -100,34 +100,6 @@ public class SimulatorApiClientTests : IDisposable
         await Assert.ThrowsAsync<JsonException>(() => _apiClient.CreatePaymentAsync(request));
     }
 
-    //TODO: confirm what is the expected response with checkout
-    // [Fact]
-    // public async Task CreatePaymentAsync_ShouldThrowException_WhenResponseIsBadRequest()
-    // {
-    //     // Arrange
-    //     var request = new PostPaymentApiRequest
-    //     {
-    //         CardNumber = "1234567890123456",
-    //         ExpiryDate = "12/2025",
-    //         Amount = 100,
-    //         Currency = "USD",
-    //         Cvv = "123"
-    //     };
-    //
-    //     // Configure WireMock to return a 400 Bad Request
-    //     _server
-    //         .Given(Request.Create()
-    //             .WithPath("/payments")
-    //             .UsingPost())
-    //         .RespondWith(Response.Create()
-    //             .WithStatusCode(400)
-    //             .WithHeader("Content-Type", "application/json")
-    //             .WithBody("{\"error\": \"Invalid request\"}"));
-    //
-    //     // Act & Assert
-    //     await Assert.ThrowsAsync<HttpRequestException>(() => _apiClient.CreatePaymentAsync(request));
-    // }
-
     [Fact]
     public async Task CreatePaymentAsync_ShouldThrowJsonException_WhenResponseIsInvalidJson()
     {
@@ -187,7 +159,7 @@ public class SimulatorApiClientTests : IDisposable
 
         Assert.Equal(httpStatusCode, exception.StatusCode);
     }
-    
+
     [Theory]
     [InlineData(408, HttpStatusCode.RequestTimeout)]
     [InlineData(429, HttpStatusCode.TooManyRequests)]
