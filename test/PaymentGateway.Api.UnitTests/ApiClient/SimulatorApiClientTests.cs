@@ -3,9 +3,9 @@ using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
-using PaymentGateway.Api.Handlers;
 using PaymentGateway.Application.Exceptions;
 using PaymentGateway.Infrastructure.ApiClient;
+using PaymentGateway.Infrastructure.Handlers;
 using PaymentGateway.Shared.Models.ApiClient.Request;
 using PaymentGateway.Shared.Models.ApiClient.Response;
 
@@ -155,8 +155,12 @@ public class SimulatorApiClientTests : IDisposable
         await Assert.ThrowsAsync<JsonException>(() => _apiClient.CreatePaymentAsync(request));
     }
 
-    [Fact]
-    public async Task CreatePaymentAsync_ShouldThrowClientApiException_WhenClientErrorOccurs()
+    [Theory]
+    [InlineData(400, HttpStatusCode.BadRequest)]
+    [InlineData(401, HttpStatusCode.Unauthorized)]
+    [InlineData(403, HttpStatusCode.Forbidden)]
+    [InlineData(422, HttpStatusCode.UnprocessableEntity)]
+    public async Task CreatePaymentAsync_ShouldThrowPaymentDeclinedException_WhenStatusCode(int statusCodeNumber, HttpStatusCode httpStatusCode)
     {
         // Arrange
         var request = new PostPaymentApiRequest
@@ -174,15 +178,45 @@ public class SimulatorApiClientTests : IDisposable
                 .WithPath("/payments")
                 .UsingPost())
             .RespondWith(Response.Create()
-                .WithStatusCode(400)
+                .WithStatusCode(statusCodeNumber)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody("{\"error\": \"Invalid request\"}"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<ClientApiException>(() => _apiClient.CreatePaymentAsync(request));
+        var exception = await Assert.ThrowsAsync<PaymentDeclinedException>(() => _apiClient.CreatePaymentAsync(request));
 
-        Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
-        Assert.Equal("Client error occurred during API call", exception.Message);
+        Assert.Equal(httpStatusCode, exception.StatusCode);
+    }
+    
+    [Theory]
+    [InlineData(408, HttpStatusCode.RequestTimeout)]
+    [InlineData(429, HttpStatusCode.TooManyRequests)]
+    public async Task CreatePaymentAsync_ShouldThrowHttpException_WhenStatusCode(int statusCodeNumber, HttpStatusCode httpStatusCode)
+    {
+        // Arrange
+        var request = new PostPaymentApiRequest
+        {
+            CardNumber = "1234567890123456",
+            ExpiryDate = "12/2025",
+            Amount = 100,
+            Currency = "USD",
+            Cvv = "123"
+        };
+
+        //Setup invalid request
+        _server
+            .Given(Request.Create()
+                .WithPath("/payments")
+                .UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(statusCodeNumber)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody("{\"error\": \"Invalid request\"}"));
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(() => _apiClient.CreatePaymentAsync(request));
+
+        Assert.Equal(httpStatusCode, exception.StatusCode);
     }
 
     public void Dispose()

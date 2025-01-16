@@ -27,6 +27,7 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
         int statusCode;
         string message;
 
+        //In order for problem details to have information regarding specific error, we log it in this middleware. 
         if (exception is HttpRequestException httpRequestException)
         {
             if (httpRequestException.StatusCode == null)
@@ -51,7 +52,6 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
         }
         else
         {
-            // Fallback
             statusCode = StatusCodes.Status500InternalServerError;
             message = "Server Error";
         }

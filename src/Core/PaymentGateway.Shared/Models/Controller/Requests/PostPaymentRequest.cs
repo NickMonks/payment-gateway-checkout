@@ -19,7 +19,7 @@ public class PostPaymentRequest
     public required string Currency { get; set; }
     [Required]
     [JsonPropertyName("amount")]
-    public required int Amount { get; set; }
+    public required long Amount { get; set; }
     [Required]
     [JsonPropertyName("cvv")]
     public required string Cvv { get; set; }

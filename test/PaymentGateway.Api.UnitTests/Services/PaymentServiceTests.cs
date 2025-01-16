@@ -121,12 +121,13 @@ public class PaymentServiceTests
             CardNumber = null,
             ExpiryDate = null,
             Currency = null,
-            Cvv = null
+            Cvv = null,
+            Amount = 10,
         };
 
         _apiClientMock
             .Setup(c => c.CreatePaymentAsync(It.IsAny<PostPaymentApiRequest>()))
-            .ThrowsAsync(new ClientApiException("Api call error", HttpStatusCode.BadRequest));
+            .ThrowsAsync(new PaymentDeclinedException("Api call error", HttpStatusCode.BadRequest));
 
         // Mock repository to store rejected payment
         _repositoryMock.Setup(r => r.CreatePaymentAsync(It.IsAny<Payment>()))

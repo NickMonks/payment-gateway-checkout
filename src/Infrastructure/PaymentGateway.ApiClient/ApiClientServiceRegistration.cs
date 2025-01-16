@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using PaymentGateway.Api.Handlers;
 using PaymentGateway.Api.Settings;
 using PaymentGateway.Application.Contracts.ApiClient;
 using PaymentGateway.Infrastructure.ApiClient;
+using PaymentGateway.Infrastructure.Handlers;
 
 namespace PaymentGateway.Infrastructure;
 

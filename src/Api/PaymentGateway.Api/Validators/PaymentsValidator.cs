@@ -22,7 +22,9 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
             .WithMessage("Expiry date cannot be in the past");
 
         RuleFor(x => x.Amount)
-            .NotEmpty().GreaterThan(0).WithMessage("Amount must be greater than zero");
+            .NotEmpty()
+            .GreaterThan(0)
+            .WithMessage("Amount must be bigger than 0.");
 
         RuleFor(x => x.Currency)
             .NotEmpty()
@@ -43,7 +45,7 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
         return year > DateTime.Now.Year || (year == DateTime.Now.Year && month >= DateTime.Now.Month);
     }
 
-    private static bool HasDigits(string number, int min, int max)
+    private static bool HasDigits(string number, long min, long max)
     {
         if (string.IsNullOrEmpty(number))
         {

@@ -1,22 +1,11 @@
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
-
 using Microsoft.Extensions.Logging;
 
 using PaymentGateway.Application.Exceptions;
 
-namespace PaymentGateway.Api.Handlers;
+namespace PaymentGateway.Infrastructure.Handlers;
 
-public class ApiExceptionHandler : DelegatingHandler
+public class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : DelegatingHandler
 {
-    private readonly ILogger<ApiExceptionHandler> _logger;
-
-    public ApiExceptionHandler(ILogger<ApiExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
-
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         try
@@ -25,11 +14,11 @@ public class ApiExceptionHandler : DelegatingHandler
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("HTTP request failed with status code {StatusCode}", response.StatusCode);
+                logger.LogWarning("HTTP request failed with status code {StatusCode}", response.StatusCode);
 
-                if ((int)response.StatusCode >= 400 && (int)response.StatusCode < 500)
+                if (IsDeclined((int)response.StatusCode))
                 {
-                    throw new ClientApiException("Client error occurred during API call", response.StatusCode);
+                    throw new PaymentDeclinedException("Client error occurred during API call - Payment Declined", response.StatusCode);
                 }
 
                 response.EnsureSuccessStatusCode();
@@ -39,8 +28,22 @@ public class ApiExceptionHandler : DelegatingHandler
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "An error occurred during the HTTP request.");
+            logger.LogError(ex, "An error occurred during the HTTP request.");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Returns true if the error code is considered due to a client malformed request:
+    /// 400 Bad Request - Invalid or malformed request
+    /// 401 Unathorized -  Missing or invalid authentication
+    /// 403 Forbidden - Client lacks permission for the action
+    /// 422 Unprocessable Entity - Semantic rules error
+    /// </summary>
+    /// <param name="statusCode"></param>
+    /// <returns></returns>
+    private bool IsDeclined(int statusCode)
+    {
+        return statusCode == 400 || statusCode == 403 || statusCode == 401 || statusCode == 422;
     }
 }

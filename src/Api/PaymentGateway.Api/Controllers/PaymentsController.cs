@@ -15,24 +15,15 @@ namespace PaymentGateway.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PaymentsController : Controller
+public class PaymentsController(IPaymentService paymentService, IMapper mapper) : Controller
 {
-    private readonly IMapper _mapper;
-    private readonly IPaymentService _paymentService;
-
-    public PaymentsController(IPaymentService paymentService, IMapper mapper)
-    {
-        _paymentService = paymentService;
-        _mapper = mapper;
-    }
-
     [HttpGet("{id:guid}")]
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<PostPaymentResponse?>> GetPaymentAsync(Guid id)
+    public async Task<ActionResult<GetPaymentResponse?>> GetPaymentAsync(Guid id)
     {
-        var paymentResponse = await _paymentService.GetPayment(id);
+        var paymentResponse = await paymentService.GetPayment(id);
 
         if (paymentResponse == null)
         {
@@ -53,8 +44,8 @@ public class PaymentsController : Controller
             return BadRequest();
         }
 
-        var paymentDto = _mapper.Map<CreatePaymentRequestDto>(request);
-        var paymentResponse = await _paymentService.CreatePayment(paymentDto);
+        var paymentDto = mapper.Map<CreatePaymentRequestDto>(request);
+        var paymentResponse = await paymentService.CreatePayment(paymentDto);
         return Ok(paymentResponse);
     }
 }

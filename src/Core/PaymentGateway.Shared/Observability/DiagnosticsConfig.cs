@@ -16,6 +16,8 @@ public static class ActivityExtensions
     {
         activity?.SetTag("payment-id", payment.PaymentId);
         activity?.SetTag("payment-status", payment.PaymentStatus);
+        activity?.SetTag("payment-amount", payment.Amount);
+        activity?.SetTag("payment-currency", payment.Currency);
     }
 
     public static void CacheEvent(this Activity activity, string paymentId, bool isHit)

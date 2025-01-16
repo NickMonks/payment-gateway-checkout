@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Application.Contracts.Services;
+using PaymentGateway.Application.Exceptions;
 using PaymentGateway.Domain.ValueObjects;
 using PaymentGateway.Shared.Helpers;
 using PaymentGateway.Shared.Mappers;
@@ -13,7 +14,6 @@ using PaymentGateway.Shared.Models.Controller.Responses;
 using PaymentGateway.Shared.Models.DTO;
 using PaymentGateway.Shared.Observability;
 
-using ClientApiException = PaymentGateway.Application.Exceptions.ClientApiException;
 using IApiClient = PaymentGateway.Application.Contracts.ApiClient.IApiClient;
 
 namespace PaymentGateway.Application.Services;
@@ -51,7 +51,7 @@ public class PaymentService(
 
             return mapper.Map<CreatePaymentResponseDto>(paymentResponse);
         }
-        catch (ClientApiException ex)
+        catch (PaymentDeclinedException ex)
         {
             // If there is a client exception type, we consider no payment could be created as invalid information
             // was supplied to the payment gateway, and therefore it has rejected the request without calling
