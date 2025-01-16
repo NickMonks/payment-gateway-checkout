@@ -1,7 +1,11 @@
 using DotNet.Testcontainers.Builders;
+
 using Microsoft.EntityFrameworkCore;
+
 using PaymentGateway.Api.Persistence;
+
 using Testcontainers.PostgreSql;
+
 using IContainer = DotNet.Testcontainers.Containers.IContainer;
 namespace PaymentGateway.Api.IntegrationTests.Helpers;
 
@@ -13,7 +17,7 @@ public class TestEnvironment : IAsyncLifetime
     public string PostgresConnectionString { get; set; }
 
     private string BankSimulatorContainerName { get; set; } = new string("bank-simulator-" + Guid.NewGuid());
-    
+
     public TestEnvironment()
     {
         // Set up PostgreSQL container
@@ -22,20 +26,20 @@ public class TestEnvironment : IAsyncLifetime
             .WithUsername("admin")
             .WithPassword("password")
             .Build();
-        
+
         var impostersPath = Path.GetFullPath("../../../Helpers/imposters");
 
         if (!Directory.Exists(impostersPath))
         {
             throw new DirectoryNotFoundException($"The imposters directory was not found at: {impostersPath}");
         }
-        
+
         BankSimulatorContainer = new ContainerBuilder()
             .WithImage("bbyars/mountebank:2.8.1")
             .WithName(BankSimulatorContainerName)
             .WithPortBinding(8080, true)
             .WithPortBinding(2525, true)
-            .WithCommand("--configfile","/imposters/bank_simulator.ejs")
+            .WithCommand("--configfile", "/imposters/bank_simulator.ejs")
             .WithBindMount(impostersPath, "/imposters")
             .Build();
     }
@@ -50,7 +54,7 @@ public class TestEnvironment : IAsyncLifetime
         await RunMigrationsAsync(PostgresConnectionString);
         var simulatorPort = BankSimulatorContainer.GetMappedPublicPort(8080);
         SimulatorBaseUrl = $"http://localhost:{simulatorPort}";
-        
+
     }
 
     public async Task DisposeAsync()
@@ -65,7 +69,7 @@ public class TestEnvironment : IAsyncLifetime
             .UseNpgsql(PostgresConnectionString)
             .Options;
     }
-    
+
     private async Task RunMigrationsAsync(string connectionString)
     {
         try
@@ -84,6 +88,6 @@ public class TestEnvironment : IAsyncLifetime
             Console.WriteLine(ex);
             throw;
         }
-        
-    } 
+
+    }
 }

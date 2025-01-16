@@ -26,7 +26,7 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
 
         int statusCode;
         string message;
-        
+
         if (exception is HttpRequestException httpRequestException)
         {
             if (httpRequestException.StatusCode == null)
@@ -36,7 +36,7 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
             }
             else
             {
-                var httpStatusCode = (HttpStatusCode) httpRequestException.StatusCode;
+                var httpStatusCode = (HttpStatusCode)httpRequestException.StatusCode;
 
                 statusCode = httpStatusCode switch
                 {
@@ -55,7 +55,7 @@ public class ExceptionsMiddleware(RequestDelegate next, ILogger<ExceptionsMiddle
             statusCode = StatusCodes.Status500InternalServerError;
             message = "Server Error";
         }
-        
+
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,

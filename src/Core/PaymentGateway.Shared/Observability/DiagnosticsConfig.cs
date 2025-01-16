@@ -26,7 +26,7 @@ public static class ActivityExtensions
             { "cache.hit", isHit }
         }));
     }
-    
+
     public static void ClientApiExceptionEvent(this Activity activity, string paymentId)
     {
         activity?.AddEvent(new ActivityEvent("ClientApiException", default, new ActivityTagsCollection

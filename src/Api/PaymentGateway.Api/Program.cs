@@ -1,9 +1,11 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+
 using Microsoft.EntityFrameworkCore;
 
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+
 using PaymentGateway.Api;
 using PaymentGateway.Api.Middlewares;
 using PaymentGateway.Api.Persistence;

@@ -36,7 +36,7 @@ services:
       - COLLECTOR_OTLP_ENABLED=true
       - LOG_LEVEL=debug
   
-  #Payment Gateway 
+  #Payment Gateway API
   api:
     build:
       context: .

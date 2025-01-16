@@ -20,7 +20,7 @@ public static class PaymentMapper
             Amount = response.Amount
         };
     }
-    
+
     public static GetPaymentResponse TogGetPaymentResponse(this Payment response)
     {
         return new GetPaymentResponse

@@ -23,7 +23,7 @@ public static class StartupExtensions
         var observabilitySettings = configuration
             .GetSection(nameof(ObservabilitySettings))
             .Get<ObservabilitySettings>() ?? throw new NullReferenceException();
-        
+
         services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
         {
             tracerProviderBuilder
@@ -31,7 +31,7 @@ public static class StartupExtensions
                 .SetResourceBuilder(
                     ResourceBuilder.CreateDefault()
                         .AddService(
-                            serviceName: observabilitySettings.ServiceName, 
+                            serviceName: observabilitySettings.ServiceName,
                             serviceVersion: observabilitySettings.ServiceVersion
                         ))
                 .AddAspNetCoreInstrumentation()
@@ -45,5 +45,5 @@ public static class StartupExtensions
 
         services.AddSingleton(TracerProvider.Default.GetTracer(observabilitySettings.ServiceName));
     }
-    
+
 }

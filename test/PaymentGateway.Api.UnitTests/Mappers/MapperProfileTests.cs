@@ -16,7 +16,7 @@ public class MappingProfileTests
     public MappingProfileTests()
     {
         var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-        config.AssertConfigurationIsValid(); 
+        config.AssertConfigurationIsValid();
         _mapper = config.CreateMapper();
     }
 
@@ -26,9 +26,9 @@ public class MappingProfileTests
         // Arrange
         var source = new CreatePaymentRequestDto
         {
-            CardNumber = "4111111111111111", 
-            ExpiryMonth = 12, 
-            ExpiryYear = 2025, 
+            CardNumber = "4111111111111111",
+            ExpiryMonth = 12,
+            ExpiryYear = 2025,
             Cvv = "123",
             Amount = 100,
             Currency = "USD",
@@ -73,9 +73,9 @@ public class MappingProfileTests
         // Arrange
         var source = new CreatePaymentRequestDto
         {
-            CardNumber = "4111111111111111", 
-            ExpiryMonth = 12, 
-            ExpiryYear = 2025, 
+            CardNumber = "4111111111111111",
+            ExpiryMonth = 12,
+            ExpiryYear = 2025,
             Cvv = "123",
             Amount = 100,
             Currency = "USD",

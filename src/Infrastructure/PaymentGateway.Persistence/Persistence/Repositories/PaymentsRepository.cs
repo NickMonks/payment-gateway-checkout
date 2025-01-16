@@ -13,7 +13,7 @@ public class PaymentsRepository(PaymentsDbContext context) : IPaymentsRepository
     {
         using var activity = DiagnosticsConfig.Source.StartActivity("Store Payment");
         activity?.SetPayment(payment);
-        
+
         await context.Payments.AddAsync(payment);
         await context.SaveChangesAsync();
         return payment;

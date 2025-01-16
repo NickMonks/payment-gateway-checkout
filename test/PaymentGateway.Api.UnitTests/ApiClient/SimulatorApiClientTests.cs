@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
+
 using PaymentGateway.Api.Handlers;
 using PaymentGateway.Application.Exceptions;
 using PaymentGateway.Infrastructure.ApiClient;
@@ -98,7 +99,7 @@ public class SimulatorApiClientTests : IDisposable
         // Act & Assert
         await Assert.ThrowsAsync<JsonException>(() => _apiClient.CreatePaymentAsync(request));
     }
-    
+
     //TODO: confirm what is the expected response with checkout
     // [Fact]
     // public async Task CreatePaymentAsync_ShouldThrowException_WhenResponseIsBadRequest()
@@ -126,7 +127,7 @@ public class SimulatorApiClientTests : IDisposable
     //     // Act & Assert
     //     await Assert.ThrowsAsync<HttpRequestException>(() => _apiClient.CreatePaymentAsync(request));
     // }
-    
+
     [Fact]
     public async Task CreatePaymentAsync_ShouldThrowJsonException_WhenResponseIsInvalidJson()
     {
@@ -153,7 +154,7 @@ public class SimulatorApiClientTests : IDisposable
         // Act & Assert
         await Assert.ThrowsAsync<JsonException>(() => _apiClient.CreatePaymentAsync(request));
     }
-    
+
     [Fact]
     public async Task CreatePaymentAsync_ShouldThrowClientApiException_WhenClientErrorOccurs()
     {
@@ -166,7 +167,7 @@ public class SimulatorApiClientTests : IDisposable
             Currency = "USD",
             Cvv = "123"
         };
-        
+
         //Setup invalid request
         _server
             .Given(Request.Create()

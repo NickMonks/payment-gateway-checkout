@@ -9,16 +9,10 @@ using PaymentGateway.Shared.Models.ApiClient.Response;
 
 namespace PaymentGateway.Infrastructure.ApiClient;
 
-public class SimulatorApiClient : IApiClient
+public class SimulatorApiClient(HttpClient httpClient, ILogger<SimulatorApiClient> logger) : IApiClient
 {
-    private readonly HttpClient _httpClient;
-    private readonly ILogger<SimulatorApiClient> _logger;
-
-    public SimulatorApiClient(HttpClient httpClient, ILogger<SimulatorApiClient> logger)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+    private readonly ILogger<SimulatorApiClient> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public async Task<PostPaymentApiResponse> CreatePaymentAsync(PostPaymentApiRequest request)
     {

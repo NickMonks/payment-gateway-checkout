@@ -1,4 +1,4 @@
-# Payment Gateway - Checkout.com
+# Payment Gateway - Checkout.com 💰
 
 ![img.png](img.png)
 
@@ -6,10 +6,13 @@ This is the .NET version of the Payment Gateway challenge.
 
 # How to run
 
-To run the project, simply run the docker-compose.yml. It will generate the Payment Gateway API image and run the docker container, alongside the dependencies.
-The service will run on `http://localhost:8081`. You can choose your preferred API Client (Postman, cURL, etc), or try out the file `requests.http`. 
+To run the project, simply run the docker-compose.yml on the command line using `docker-compose up -d`.
+It will generate the Payment Gateway API image and run the docker container, alongside the dependencies.
 
-Currently it supports two endpoints:
+The service will run on `http://localhost:8081`. To test the APIs, You can choose your preferred API Client (Postman, cURL, etc), 
+or try out the file `requests.http`. Just remember to replace the payment-id placeholder with the one you created.
+
+Currently, it supports two endpoints:
 
 - `api/Payments`:
 
@@ -42,7 +45,7 @@ Specifically it covers the following:
   - **Authorized** - the payment was authorized by the call to the acquiring bank
   - **Declined** - the payment was declined by the call to the acquiring bank
   - **Rejected** - When the bank simulator returns a specific error code (client errors 400, 401, 403, etc.) instead of returning an error to the end-user, we will store the payment as rejected and return this response to the user. 
-    - This 
+    - TODO, explain decisions
 
 
 # Non-Functional Requirements
@@ -98,7 +101,7 @@ When running the `docker-compose.yml`, you should be able see the traces of each
 
 ## Data Storage
 
-TODO
+To query the database, please use the following JDBC connection string: `jdbc:postgresql://localhost:5432/payments-db?user=admin&password=password`.
 
 ## Testing
 

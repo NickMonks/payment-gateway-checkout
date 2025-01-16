@@ -1,8 +1,12 @@
 using System.Net;
+
 using AutoMapper;
+
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+
 using Moq;
+
 using PaymentGateway.Api.Models;
 using PaymentGateway.Application.Contracts.ApiClient;
 using PaymentGateway.Application.Contracts.Persistence;
@@ -30,7 +34,7 @@ public class PaymentServiceTests
         Mock<ILogger<PaymentService>> loggerMock = new();
         _apiClientMock = new Mock<IApiClient>();
         _repositoryMock = new Mock<IPaymentsRepository>();
-        
+
         var configuration = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<MappingProfile>();
@@ -83,7 +87,7 @@ public class PaymentServiceTests
         Assert.Equal(request.Currency, result.Currency);
         Assert.Equal(request.Amount, result.Amount);
         Assert.Equal(request.CardNumber[^4..], result.CardNumberLastFour.ToString());
-        
+
         var lastFourDigits = request.CardNumber[^4..];
         _apiClientMock.Verify(r => r.CreatePaymentAsync(It.IsAny<PostPaymentApiRequest>()), Times.Once);
         _repositoryMock.Verify(r => r.CreatePaymentAsync(It.IsAny<Payment>()), Times.Once);
@@ -138,7 +142,7 @@ public class PaymentServiceTests
 
         // Assert
         Assert.Equal(PaymentStatus.Rejected.ToString(), result.Status);
-        _repositoryMock.Verify(r => r.CreatePaymentAsync(It.Is<Payment>(p => 
+        _repositoryMock.Verify(r => r.CreatePaymentAsync(It.Is<Payment>(p =>
             p.PaymentStatus == PaymentStatus.Rejected)), Times.Once);
     }
 
@@ -192,7 +196,7 @@ public class PaymentServiceTests
             ExpiryMonth = "12",
             ExpiryYear = "2025",
         };
-        
+
         _repositoryMock.Setup(r => r.GetPaymentByIdAsync(paymentId)).ReturnsAsync(paymentEntity);
 
         // Act

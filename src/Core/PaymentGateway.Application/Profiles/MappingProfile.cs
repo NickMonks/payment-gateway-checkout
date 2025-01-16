@@ -15,16 +15,16 @@ public class MappingProfile : Profile
     {
         ServiceMappingProfile();
         CreateMap<CreatePaymentRequestDto, PostPaymentApiRequest>()
-            .ForMember(dest => dest.CardNumber, 
-                opt => 
-                    opt.MapFrom(src => src.CardNumber)) 
-            .ForMember(dest => dest.ExpiryDate, 
-                opt => 
+            .ForMember(dest => dest.CardNumber,
+                opt =>
+                    opt.MapFrom(src => src.CardNumber))
+            .ForMember(dest => dest.ExpiryDate,
+                opt =>
                 opt.MapFrom(src => $"{src.ExpiryMonth:D2}/{src.ExpiryYear:D4}"))
-            .ForMember(dest => 
-                dest.Cvv, opt => 
+            .ForMember(dest =>
+                dest.Cvv, opt =>
                 opt.MapFrom(src => src.Cvv.ToString()));
-        
+
         CreateMap<PostPaymentApiResponse, PaymentStatus>()
             .ConvertUsing(src => src.Authorized ? PaymentStatus.Authorized : PaymentStatus.Declined);
     }
@@ -33,7 +33,7 @@ public class MappingProfile : Profile
     {
         CreateMap<PostPaymentRequest, CreatePaymentRequestDto>();
         CreateMap<CreatePaymentRequestDto, PostPaymentRequest>();
-        
+
         CreateMap<PostPaymentResponse, CreatePaymentResponseDto>();
         CreateMap<CreatePaymentResponseDto, PostPaymentResponse>();
     }

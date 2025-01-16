@@ -12,11 +12,13 @@ using PaymentGateway.Shared.Models.Controller.Responses;
 
 namespace PaymentGateway.Api.IntegrationTests.Controller;
 
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http.Json;
+
+using Microsoft.AspNetCore.Mvc.Testing;
+
 using Xunit;
 
-public class PaymentsControllerTests : 
+public class PaymentsControllerTests :
     IClassFixture<WebApplicationFactory<Program>>, IClassFixture<TestEnvironment>
 {
     private readonly HttpClient _client;
@@ -24,11 +26,11 @@ public class PaymentsControllerTests :
     private readonly IMemoryCache _memoryCache;
 
     public PaymentsControllerTests(
-        WebApplicationFactory<Program> factory, 
+        WebApplicationFactory<Program> factory,
         TestEnvironment testEnvironment)
     {
         _testEnvironment = testEnvironment;
-        
+
         var sharedMemoryCache = new MemoryCache(new MemoryCacheOptions());
         _memoryCache = sharedMemoryCache;
 
@@ -43,16 +45,16 @@ public class PaymentsControllerTests :
                 {
                     client.BaseAddress = new Uri(testEnvironment.SimulatorBaseUrl);
                 });
-                
+
                 services.AddSingleton<IMemoryCache>(sharedMemoryCache);
 
             });
         }).CreateClient();
     }
-    
+
     [Theory]
-    [InlineData("01","2024")]
-    [InlineData("00","2025")]
+    [InlineData("01", "2024")]
+    [InlineData("00", "2025")]
     public async Task CreatePayment_ShouldReturn400BadRequest_WhenExpiredCard(string expiryMonth, string expiryYear)
     {
         // Arrange
@@ -72,7 +74,7 @@ public class PaymentsControllerTests :
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
-    
+
     [Theory]
     [InlineData(-100)]
     [InlineData(0)]
@@ -95,7 +97,7 @@ public class PaymentsControllerTests :
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
-    
+
     [Theory]
     [InlineData("1234")]
     [InlineData("12")]
@@ -120,7 +122,7 @@ public class PaymentsControllerTests :
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    
+
     [Theory]
     [InlineData("123456")]
     [InlineData("22224053432488**")]
@@ -174,7 +176,7 @@ public class PaymentsControllerTests :
         Assert.NotNull(payment);
         Assert.Equal(paymentResponse.Id, payment.PaymentId);
     }
-    
+
     [Fact]
     public async Task CreatePayment_ShouldReturn200_WhenDeclinedPayment_AndStoreInDatabase()
     {
@@ -203,7 +205,7 @@ public class PaymentsControllerTests :
         Assert.NotNull(payment);
         Assert.Equal(paymentResponse.Id, payment.PaymentId);
     }
-    
+
     [Fact]
     public async Task CreatePayment_ShouldReturnDeclinedPaymentAndStoreInDatabase()
     {
@@ -274,7 +276,7 @@ public class PaymentsControllerTests :
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task GetPayment_ShouldReturn200Ok_WhenPaymentExists()
     {
@@ -310,7 +312,7 @@ public class PaymentsControllerTests :
         Assert.Equal(paymentEntity.Amount, paymentResponse.Amount);
         Assert.Equal(paymentEntity.PaymentStatus.ToString(), paymentResponse.Status);
     }
-    
+
     [Fact]
     public async Task GetPayment_ShouldReturnOkPayment_Cached()
     {
@@ -326,7 +328,7 @@ public class PaymentsControllerTests :
             Amount = 100,
             Status = PaymentStatus.Authorized.ToString()
         };
-        
+
         _memoryCache.Set(paymentId, paymentResponse);
 
         // Act

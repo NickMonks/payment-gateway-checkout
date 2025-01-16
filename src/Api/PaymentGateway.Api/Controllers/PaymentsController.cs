@@ -1,8 +1,11 @@
 ﻿using System.Diagnostics;
 
 using AutoMapper;
+
 using Microsoft.AspNetCore.Mvc;
+
 using OpenTelemetry.Trace;
+
 using PaymentGateway.Application.Contracts.Services;
 using PaymentGateway.Shared.Models.Controller.Requests;
 using PaymentGateway.Shared.Models.Controller.Responses;
@@ -42,13 +45,14 @@ public class PaymentsController : Controller
     [HttpPost]
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PostPaymentResponse?>> CreatePaymentAsync([FromBody] PostPaymentRequest request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest();
         }
-        
+
         var paymentDto = _mapper.Map<CreatePaymentRequestDto>(request);
         var paymentResponse = await _paymentService.CreatePayment(paymentDto);
         return Ok(paymentResponse);

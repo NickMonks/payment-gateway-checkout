@@ -11,14 +11,14 @@ public static class StringExtensions
             throw new ArgumentException("Input must be at least 4 characters long", nameof(input));
         }
 
-        
+
         if (!BigInteger.TryParse(input, out _))
         {
             throw new FormatException("The last 4 characters are not numeric.");
         }
-        
-        string lastFourDigits = input[^4..]; 
-        
+
+        string lastFourDigits = input[^4..];
+
         if (!int.TryParse(lastFourDigits, out int result))
         {
             throw new FormatException("The last 4 characters are not numeric.");

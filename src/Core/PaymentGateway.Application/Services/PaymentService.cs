@@ -1,6 +1,8 @@
 using AutoMapper;
+
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+
 using PaymentGateway.Application.Contracts.Persistence;
 using PaymentGateway.Application.Contracts.Services;
 using PaymentGateway.Domain.ValueObjects;
@@ -29,7 +31,7 @@ public class PaymentService(
         using var activity = DiagnosticsConfig.Source.StartActivity("PaymentService.CreatePayment");
         var apiRequest = mapper.Map<PostPaymentApiRequest>(request);
         var paymentId = Guid.NewGuid();
-        
+
         try
         {
             var apiResponse = await simulatorApiClient.CreatePaymentAsync(apiRequest);
@@ -56,7 +58,7 @@ public class PaymentService(
             // the acquiring bank. Therefore, it will be stored and returned as Rejected. 
             logger.LogWarning(ex, "Payment rejected due to client error.");
             activity?.ClientApiExceptionEvent(paymentId.ToString());
-            
+
             var rejectedPayment = new PostPaymentResponse
             {
                 Id = paymentId,
@@ -85,7 +87,7 @@ public class PaymentService(
             logger.LogInformation($"Payment with ID {paymentId} retrieved from cache.");
             return cachedPayment;
         }
-        
+
         activity?.CacheEvent(paymentId.ToString(), false);
         logger.LogInformation($"Payment with ID {paymentId} not found in cache. Retrieving from database.");
         var paymentDb = await paymentsRepository.GetPaymentByIdAsync(paymentId);

@@ -31,7 +31,7 @@ public class PaymentsValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData("123456789012")]
-    [InlineData("12345678901234567890")] 
+    [InlineData("12345678901234567890")]
     [InlineData("1234abcd5678efgh")]
     public void Validate_ShouldFail_WhenCardNumberIsInvalid(string cardNumber)
     {
@@ -100,7 +100,7 @@ public class PaymentsValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "ExpiryMonth");
     }
-    
+
     [Fact]
     public void Validate_ShouldFail_WhenExpiryYearIsInThePast()
     {
