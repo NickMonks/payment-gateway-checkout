@@ -1,3 +1,30 @@
+### Example of Authorised Payment
+POST http://localhost:8081/api/Payments
+Content-Type: application/json
+
+{
+  "card_number": "2222405343248877",
+  "expiry_month": "04",
+  "expiry_year": "2025",
+  "currency": "GBP",
+  "amount": 100,
+  "cvv": "123"
+}
+
+### Example of Declined Payment
+POST http://localhost:8081/api/Payments
+Content-Type: application/json
+
+{
+  "card_number": "2222405343248112",
+  "expiry_month": "01",
+  "expiry_year": "2026",
+  "currency": "USD",
+  "amount": 60000,
+  "cvv": "456"
+}
+
+### Example of Rejected Payment
 POST http://localhost:8081/api/Payments
 Content-Type: application/json
 
@@ -10,7 +37,7 @@ Content-Type: application/json
   "cvv": "456"
 }
 
-###
-@id = "your-payment-id"
+### Get payment response
+@id = "<your-payment-id>"
 GET https://localhost:8081/api/Payments/{{id}}}
 Content-Type: application/json
