@@ -3,6 +3,7 @@ using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
+using PaymentGateway.Application.Contracts.ApiClient;
 using PaymentGateway.Application.Exceptions;
 using PaymentGateway.Infrastructure.ApiClient;
 using PaymentGateway.Infrastructure.Handlers;
