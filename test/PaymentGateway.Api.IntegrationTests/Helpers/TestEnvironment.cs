@@ -21,10 +21,9 @@ public class TestEnvironment : IAsyncLifetime
     public string PostgresConnectionString { get; set; }
     private string BankSimulatorContainerName { get; set; } = new string("bank-simulator-" + Guid.NewGuid());
 
-    public TestEnvironment(string simulatorBaseUrl, string postgresConnectionString)
+    public TestEnvironment()
     {
-        SimulatorBaseUrl = simulatorBaseUrl;
-        PostgresConnectionString = postgresConnectionString;
+        
         PostgresContainer = new PostgreSqlBuilder()
             .WithDatabase("payments-db")
             .WithUsername("admin")

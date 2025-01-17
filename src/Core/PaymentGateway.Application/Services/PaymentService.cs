@@ -28,7 +28,7 @@ public class PaymentService(
 {
     public async Task<CreatePaymentResponseDto> CreatePayment(CreatePaymentRequestDto request)
     {
-        using var activity = DiagnosticsConfig.Source.StartActivity("PaymentService.CreatePayment");
+        using var activity = DiagnosticsConfig.Source.StartActivity($"{nameof(PaymentService)}.{nameof(CreatePayment)}");
         var apiRequest = mapper.Map<PostPaymentApiRequest>(request);
         var paymentId = Guid.NewGuid();
 
@@ -79,7 +79,7 @@ public class PaymentService(
 
     public async Task<GetPaymentResponse?> GetPayment(Guid paymentId)
     {
-        using var activity = DiagnosticsConfig.Source.StartActivity("PaymentService.GetPayment");
+        using var activity = DiagnosticsConfig.Source.StartActivity($"{nameof(PaymentService)}.{nameof(GetPayment)}");
 
         if (cache.TryGetValue(paymentId, out GetPaymentResponse? cachedPayment))
         {

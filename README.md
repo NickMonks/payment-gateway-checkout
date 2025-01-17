@@ -1,7 +1,5 @@
 # Payment Gateway Challenge @ Checkout.com
 
-![img.png](img.png)
-
 # How to run
 
 To run the project, simply run the `docker-compose.yml` on the command line:
@@ -41,14 +39,13 @@ curl -X GET http://localhost:8081/api/Payments/<YOUR-PAYMENT-ID> \
 # Functional Requirements
 
 The aim of this project/service is to cover the functional requirements described in [here](https://github.com/cko-recruitment/).
-Specifically it covers the following:
+To cover them up here too:
 
 - A merchant should be able to process a payment through the payment gateway and receive one of the following types of response:
   - **Authorized** - the payment was authorized by the call to the acquiring bank
   - **Declined** - the payment was declined by the call to the acquiring bank
-    - **Rejected** - When the bank simulator returns a specific client error code, we can assume the payment has failed due to the user request (e.g. 400 Bad Request).
-    > [!NOTE]
-    This is a bit different from the original requirements, but I considered it might be what we will like to do on a real scenario. 
+  - **Rejected** - When the bank simulator returns a specific client error code, we can assume the payment has failed due to the user request (e.g. 400 Bad Request).
+    > This is a bit different from the original requirements, but I considered it might be what we will like to do on a real scenario. 
 - A merchant should be able to retrieve the details of a previously made payment.
 
 # Non-Functional Requirements
@@ -56,7 +53,10 @@ Specifically it covers the following:
 Below is a description of the low-level, technical details of the current project, 
 with some justification on the why.
 
-TODO
+- Fault-Tolerant: we want to be able to set retries when the client request fails if it's due to a 5xx or Timeout error.
+- Strongly consistent: we need to provide consistency guarantees in our payment systems, critical to avoid inconsistencies with balances and payments.
+- Low latency
+- Scalable to millions of users
 
 # Technical Details 
 
@@ -107,8 +107,6 @@ When running the `docker-compose.yml`, you should be able see the traces of each
 In order to store the payments response, I used Postgres as the main persistence. The reason is because of its strong ACID properties, 
 which is essential in a strongly consistent distributed system like a payment system.
 
-TODO
-
 To query the database, please use the following JDBC connection string: `jdbc:postgresql://localhost:5432/payments-db?user=admin&password=password`.
 
 ## Caching
@@ -136,7 +134,7 @@ Some description provided below:
 Below are some potential improvements I purposelly left out of the implementation, due to the nature of the 
 project been an MVP and limited amount of time, but it would be interesting to explore in the future!
 
-- [ ] Authentication/Authorization
+- [ ] Authentication/Authorization of our APIs
 - [ ] CI pipeline using Github Actions
 - [ ] CD and deployment in AWS or other cloud provider
 - [ ] BDD or Behaviour-Driven Testing
