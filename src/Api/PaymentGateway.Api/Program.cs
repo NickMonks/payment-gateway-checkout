@@ -8,8 +8,8 @@ using OpenTelemetry.Trace;
 
 using PaymentGateway.Api;
 using PaymentGateway.Api.Middlewares;
-using PaymentGateway.Api.Persistence;
 using PaymentGateway.Api.Validators;
+using PaymentGateway.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

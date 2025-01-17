@@ -16,7 +16,7 @@ public class SimulatorApiClient(HttpClient httpClient, ILogger<SimulatorApiClien
 
     public async Task<PostPaymentApiResponse> CreatePaymentAsync(PostPaymentApiRequest request)
     {
-        _logger.LogInformation("Sending payment creation request");
+        _logger.LogInformation($"{nameof(CreatePaymentAsync)} - Beginning to create payment");
 
         var bodyContent = new StringContent(
             JsonSerializer.Serialize(request),

@@ -1,15 +1,17 @@
-# Payment Gateway - Checkout.com 💰
+# Payment Gateway Challenge @ Checkout.com
 
 ![img.png](img.png)
 
-This is the .NET version of the Payment Gateway challenge.
-
 # How to run
 
-To run the project, simply run the docker-compose.yml on the command line using `docker-compose up -d`.
+To run the project, simply run the `docker-compose.yml` on the command line:
+
+```shell
+  docker-compose up -d
+```
 It will generate the Payment Gateway API image and run the docker container, alongside the dependencies.
 
-The service will run on `http://localhost:8081`. To test the APIs, You can choose your preferred API Client (Postman, cURL, etc), 
+The service will run locally on `http://localhost:8081`. To test the APIs, You can choose your preferred API Client (Postman, cURL, etc), 
 or try out the file `requests.http`. Just remember to replace the payment-id placeholder with the one you created.
 
 Currently, it supports two endpoints:
@@ -44,18 +46,19 @@ Specifically it covers the following:
 - A merchant should be able to process a payment through the payment gateway and receive one of the following types of response:
   - **Authorized** - the payment was authorized by the call to the acquiring bank
   - **Declined** - the payment was declined by the call to the acquiring bank
-  - **Rejected** - When the bank simulator returns a specific error code (client errors 400, 401, 403, etc.) instead of returning an error to the end-user, we will store the payment as rejected and return this response to the user. 
-    - TODO, explain decisions
-
+    - **Rejected** - When the bank simulator returns a specific client error code, we can assume the payment has failed due to the user request (e.g. 400 Bad Request).
+    > [!NOTE]
+    This is a bit different from the original requirements, but I considered it might be what we will like to do on a real scenario. 
+- A merchant should be able to retrieve the details of a previously made payment.
 
 # Non-Functional Requirements
 
 Below is a description of the low-level, technical details of the current project, 
 with some justification on the why.
 
-- The service should be 
+TODO
 
-# Technical Details
+# Technical Details 
 
 ## Architecture
 
@@ -101,7 +104,18 @@ When running the `docker-compose.yml`, you should be able see the traces of each
 
 ## Data Storage
 
+In order to store the payments response, I used Postgres as the main persistence. The reason is because of its strong ACID properties, 
+which is essential in a strongly consistent distributed system like a payment system.
+
+TODO
+
 To query the database, please use the following JDBC connection string: `jdbc:postgresql://localhost:5432/payments-db?user=admin&password=password`.
+
+## Caching
+
+For the get payment request, I set up a simple in-memory cache with an expiration. This improves our GET request with minimal effort.
+However, in a real scenario where we have many replicas of our service, this should treated carefully: in-memory is ephemeral and therefore unreliable,
+and each replica will store different keys, causing inconsistencies. 
 
 ## Testing
 
@@ -116,15 +130,16 @@ Some description provided below:
   - Aims to ensure that different parts of the application work together as expected.
   - To do so, I tested directly from the Controllers using the `TestContainers` library, a lightweight solution to run some dependencies as docker containers. 
   - For the project I had to setup containers for Postgres and the `bbyars/mountebank` image. 
+
 # Future Improvements
 
 Below are some potential improvements I purposelly left out of the implementation, due to the nature of the 
-project and limited amount of time, but it would be interesting to explore!
+project been an MVP and limited amount of time, but it would be interesting to explore in the future!
 
 - [ ] Authentication/Authorization
 - [ ] CI pipeline using Github Actions
-- [ ] CD of the overall service
+- [ ] CD and deployment in AWS or other cloud provider
 - [ ] BDD or Behaviour-Driven Testing
-- [ ] Idempotency Key for retriable payments 
+- [ ] Idempotency Key header for retryable payments 
 - [ ] Better separation of layers (i.e. remove the Shared library)
 

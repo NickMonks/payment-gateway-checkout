@@ -3,10 +3,10 @@ using Microsoft.Extensions.Caching.Memory;
 
 using PaymentGateway.Api.IntegrationTests.Helpers;
 using PaymentGateway.Api.Models;
-using PaymentGateway.Api.Persistence;
 using PaymentGateway.Domain.Entities;
 using PaymentGateway.Domain.ValueObjects;
 using PaymentGateway.Infrastructure.ApiClient;
+using PaymentGateway.Persistence;
 using PaymentGateway.Shared.Models.Controller.Requests;
 using PaymentGateway.Shared.Models.Controller.Responses;
 

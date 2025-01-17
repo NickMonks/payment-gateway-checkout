@@ -2,7 +2,7 @@ using DotNet.Testcontainers.Builders;
 
 using Microsoft.EntityFrameworkCore;
 
-using PaymentGateway.Api.Persistence;
+using PaymentGateway.Persistence;
 
 using Testcontainers.PostgreSql;
 
