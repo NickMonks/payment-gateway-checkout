@@ -18,7 +18,7 @@ public class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : Delegati
 
                 if (IsDeclined((int)response.StatusCode))
                 {
-                    throw new PaymentDeclinedException("Client error occurred during API call - Payment Declined", response.StatusCode);
+                    throw new PaymentRejectedException("Client error occurred during API call - Payment Declined", response.StatusCode);
                 }
 
                 response.EnsureSuccessStatusCode();

@@ -38,6 +38,6 @@ Content-Type: application/json
 }
 
 ### Get payment response
-@id = "<your-payment-id>"
-GET https://localhost:8081/api/Payments/{{id}}}
+@id = 1ace4bcd-e23a-4764-86ad-7c1e0b54e574
+GET http://localhost:8081/api/Payments/{{id}}
 Content-Type: application/json

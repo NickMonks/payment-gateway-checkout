@@ -155,7 +155,7 @@ public class SimulatorApiClientTests : IDisposable
                 .WithBody("{\"error\": \"Invalid request\"}"));
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<PaymentDeclinedException>(() => _apiClient.CreatePaymentAsync(request));
+        var exception = await Assert.ThrowsAsync<PaymentRejectedException>(() => _apiClient.CreatePaymentAsync(request));
 
         Assert.Equal(httpStatusCode, exception.StatusCode);
     }

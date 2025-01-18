@@ -51,11 +51,8 @@ public class PaymentService(
 
             return mapper.Map<CreatePaymentResponseDto>(paymentResponse);
         }
-        catch (PaymentDeclinedException ex)
+        catch (PaymentRejectedException ex)
         {
-            // If there is a client exception type, we consider no payment could be created as invalid information
-            // was supplied to the payment gateway, and therefore it has rejected the request without calling
-            // the acquiring bank. Therefore, it will be stored and returned as Rejected. 
             logger.LogWarning(ex, "Payment rejected due to client error.");
             activity?.ClientApiExceptionEvent(paymentId.ToString());
 
