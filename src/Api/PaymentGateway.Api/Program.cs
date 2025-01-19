@@ -24,6 +24,7 @@ builder.Services.AddObservability(builder.Configuration);
 
 var app = builder.Build();
 
+//Required to run migrations when the application starts up
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -46,11 +47,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseRouting();
+app.UseMiddleware<ExceptionsMiddleware>();
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseMiddleware<OpenTelemetryMiddleware>();
 app.UseAuthorization();
-app.UseMiddleware<ExceptionsMiddleware>();
 app.MapControllers();
 
 app.Run();

@@ -28,7 +28,7 @@ public class PaymentsValidator : AbstractValidator<PostPaymentRequest>
 
         RuleFor(x => x.Currency)
             .NotEmpty()
-            .Must(cvv => cvv.ToString().Length == 3)
+            .Must(currency => currency.ToString().Length == 3)
             .WithMessage("Currency should be 3 character long.")
             .Must(BeValidCurrency)
             .WithMessage("Currency is not valid.");

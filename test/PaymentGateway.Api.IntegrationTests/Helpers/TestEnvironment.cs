@@ -55,7 +55,7 @@ public class TestEnvironment : IAsyncLifetime
         await BankSimulatorContainer.StartAsync();
         PostgresConnectionString = PostgresContainer.GetConnectionString();
 
-        //Ensure we run the migrations after initialization
+        //Important: Ensure we run the migrations after initialization
         await RunMigrationsAsync(PostgresConnectionString);
         var simulatorPort = BankSimulatorContainer.GetMappedPublicPort(8080);
         SimulatorBaseUrl = $"http://localhost:{simulatorPort}";

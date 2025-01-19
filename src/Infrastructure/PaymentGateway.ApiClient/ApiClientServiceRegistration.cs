@@ -13,7 +13,7 @@ namespace PaymentGateway.Infrastructure;
 
 public static class ApiClientServiceRegistration
 {
-    public static IServiceCollection AddApiClientServices(this IServiceCollection services,
+    public static void AddApiClientServices(this IServiceCollection services,
         IConfiguration configuration)
     {
         services.AddHttpClient<IApiClient, SimulatorApiClient>(nameof(SimulatorApiClient), client =>
@@ -27,7 +27,6 @@ public static class ApiClientServiceRegistration
             .AddPolicyHandler(GetRetryPolicy())
             .AddHttpMessageHandler<ApiExceptionHandler>();
         services.AddTransient<ApiExceptionHandler>();
-        return services;
     }
     
     /// <summary>

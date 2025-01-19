@@ -51,7 +51,7 @@ public class PaymentsControllerTests :
             });
         }).CreateClient();
     }
-
+    
     [Theory]
     [InlineData("01", "2024")]
     [InlineData("00", "2025")]
@@ -179,35 +179,6 @@ public class PaymentsControllerTests :
 
     [Fact]
     public async Task CreatePayment_ShouldReturn200_WhenDeclinedPayment_AndStoreInDatabase()
-    {
-        // Arrange
-        var paymentRequest = new PostPaymentRequest
-        {
-            CardNumber = "2222405343248112",
-            ExpiryMonth = 01,
-            ExpiryYear = 2026,
-            Currency = "USD",
-            Amount = 60000,
-            Cvv = "456"
-        };
-
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/Payments", paymentRequest);
-        var paymentResponse = await response.Content.ReadFromJsonAsync<PostPaymentResponse>();
-
-        // Assert
-        Assert.NotNull(paymentResponse);
-        Assert.Equal(8112, paymentResponse.CardNumberLastFour);
-        Assert.Equal(PaymentStatus.Declined.ToString(), paymentResponse.Status);
-
-        await using var dbContext = new PaymentsDbContext(_testEnvironment.CreateDbContextOptions());
-        var payment = await dbContext.Payments.FirstOrDefaultAsync(p => p.PaymentId == paymentResponse.Id);
-        Assert.NotNull(payment);
-        Assert.Equal(paymentResponse.Id, payment.PaymentId);
-    }
-
-    [Fact]
-    public async Task CreatePayment_ShouldReturnDeclinedPaymentAndStoreInDatabase()
     {
         // Arrange
         var paymentRequest = new PostPaymentRequest

@@ -34,16 +34,17 @@ public class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : Delegati
     }
 
     /// <summary>
-    /// Returns true if the error code is considered due to a client malformed request:
+    /// Returns true if the error code is equivalent to a malformed request/invalid request from client:
     /// 400 Bad Request - Invalid or malformed request
     /// 401 Unathorized -  Missing or invalid authentication
-    /// 403 Forbidden - Client lacks permission for the action
-    /// 422 Unprocessable Entity - Semantic rules error
+    /// 403 Forbidden - Client lacks permission for the payment
+    /// 422 Unprocessable Entity - Semantic rules error - it is valid request but business logic on server side reject it
+    /// (e.g. negative amounts for example)
     /// </summary>
     /// <param name="statusCode"></param>
     /// <returns></returns>
     private bool IsDeclined(int statusCode)
     {
-        return statusCode == 400 || statusCode == 403 || statusCode == 401 || statusCode == 422;
+        return statusCode is 400 or 403 or 401 or 422;
     }
 }

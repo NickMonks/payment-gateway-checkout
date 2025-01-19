@@ -21,6 +21,7 @@ public class PaymentsController(IPaymentService paymentService, IMapper mapper) 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<GetPaymentResponse?>> GetPaymentAsync(Guid id)
     {
         var paymentResponse = await paymentService.GetPayment(id);
@@ -37,6 +38,7 @@ public class PaymentsController(IPaymentService paymentService, IMapper mapper) 
     [ProducesDefaultResponseType]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<PostPaymentResponse?>> CreatePaymentAsync([FromBody] PostPaymentRequest request)
     {
         if (!ModelState.IsValid)

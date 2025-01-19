@@ -4,8 +4,6 @@ namespace PaymentGateway.Api.Middlewares;
 
 public class OpenTelemetryMiddleware(RequestDelegate next, Tracer tracer, ILogger<OpenTelemetryMiddleware> logger)
 {
-    private readonly ILogger<OpenTelemetryMiddleware> _logger = logger;
-
     public async Task InvokeAsync(HttpContext context)
     {
         using var span = tracer.StartActiveSpan("HTTP Request", SpanKind.Server);

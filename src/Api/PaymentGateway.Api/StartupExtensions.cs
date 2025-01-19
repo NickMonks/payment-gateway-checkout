@@ -10,6 +10,12 @@ namespace PaymentGateway.Api;
 
 public static class StartupExtensions
 {
+    /// <summary>
+    /// Extension method that registers all the dependencies from each layer separately, to ensure clear
+    /// separation of concerns
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
     public static void AddStartupServices(this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -17,7 +23,7 @@ public static class StartupExtensions
         services.AddApiClientServices(configuration);
         services.AddApplicationServices(configuration);
     }
-
+    
     public static void AddObservability(this IServiceCollection services, IConfiguration configuration)
     {
         var observabilitySettings = configuration
